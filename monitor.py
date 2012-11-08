@@ -11,6 +11,7 @@ conf_filename = "index.html"
 
 volumes = [ 1, 2, 3, 4, 5 ]
 hds     = [ "/dev/sda", "/dev/sdb" ]
+ifaces	= [ "eth0" ]
 
 #
 #
@@ -37,7 +38,7 @@ class Volume:
         self._cmd = run_command("df -m")
 	self._data = { }
 
-    def store(self, dev):
+    def parse(self, dev):
         m = search("^" + dev + "\s+(\d+)\s+(\d+)", self._cmd)
         [ total, used ] = int_array(m.group(1, 2))
         self._data[dev] = [ total, used, 100.0 * used / total ]
@@ -60,7 +61,7 @@ class SmartData:
             self._cmd[i] = run_command("smartctl -d ata -A " + i)
 	    self._data[i] = { }
 
-    def store(self, hd, parm):
+    def parse(self, hd, parm):
 	if self._cmd[hd] == None:
             self._data[hd][parm] = 0
         else:
@@ -75,25 +76,47 @@ class SmartData:
                 print "        %-20.20s: %d" % (j, self._data[i][j])
             print
 
+class Interface:
+    def __init__(self, iflist):
+        self._cmd = { }
+        self._data = { }
+
+        for i in iflist:
+            self._cmd[i] = run_command("ifconfig " + i)
+
+    def parse(self, iface):
+        m = search("RX bytes:(\d+) .*TX bytes:(\d+)", self._cmd[iface])
+        self._data[iface] = int_array(m.group(1, 2))
+
+    def show(self):
+        print "Network interface data:"
+	for i in sorted(self._data.keys()):
+            print "    %s:" % (i)
+            print "        Rx bytes : %d" % (self._data[i][0])
+            print "        Tx bytes : %d" % (self._data[i][1])
+            print
 #
 #
 #
 
-def store(hd, vol):
-    vol.store("/dev/md0")
+def parse(hd, vol, iface):
+    vol.parse("/dev/md0")
     
     for i in volumes:
-        vol.store("/dev/vg1/volume_%d" % (i))
+        vol.parse("/dev/vg1/volume_%d" % (i))
     
     for i in hds:
-        hd.store(i, "Temperature_Celsius")
-        hd.store(i, "Power_On_Hours")
-        hd.store(i, "Start_Stop_Count")
+        hd.parse(i, "Temperature_Celsius")
+        hd.parse(i, "Power_On_Hours")
+        hd.parse(i, "Start_Stop_Count")
     
+    for i in ifaces:
+        iface.parse(i)
 
-def show(hd, vol):
+def show(hd, vol, iface):
     hd.show()
     vol.show()
+    iface.show()
 
 
 if __name__ == "__main__":
@@ -105,6 +128,7 @@ if __name__ == "__main__":
     if sys.argv[1] == "show":
         vol = Volume()
         hd = SmartData(hds)
-	store(hd, vol)
-        show(hd, vol)
+	iface = Interface(ifaces) 
+	parse(hd, vol, iface)
+        show(hd, vol, iface)
 
