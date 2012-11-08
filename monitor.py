@@ -43,7 +43,13 @@ class Volume:
         self._data[dev] = [ total, used, 100.0 * used / total ]
 
     def show(self):
-	print self._data
+	print "Volume data:"
+	for i in self._data.keys():
+            print "    %s:" % (i)
+            print "        Total size : %d" % (self._data[i][0])
+            print "        Used size  : %d" % (self._data[i][1])
+            print "        Percent    : %4.1f%%" % (self._data[i][2])
+            print
 
 class SmartData:
     def __init__(self, hdlist):
@@ -59,10 +65,15 @@ class SmartData:
             self._data[hd][parm] = 0
         else:
             m = search(parm + " .* (\d+)$", self._cmd[hd])
-            self._data[hd][parm] = m.group(1)
+            self._data[hd][parm] = int(m.group(1))
 
     def show(self):
-	print self._data
+        print "Hard disk data:"
+	for i in self._data.keys():
+            print "    %s:" % (i)
+	    for j in self._data[i].keys():
+                print "        %-20.20s: %d" % (j, self._data[i][j])
+            print
 
 #
 #
