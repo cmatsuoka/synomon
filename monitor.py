@@ -44,7 +44,7 @@ class Volume:
 
     def show(self):
 	print "Volume data:"
-	for i in self._data.keys():
+	for i in sorted(self._data.keys()):
             print "    %s:" % (i)
             print "        Total size : %d" % (self._data[i][0])
             print "        Used size  : %d" % (self._data[i][1])
@@ -69,7 +69,7 @@ class SmartData:
 
     def show(self):
         print "Hard disk data:"
-	for i in self._data.keys():
+	for i in sorted(self._data.keys()):
             print "    %s:" % (i)
 	    for j in self._data[i].keys():
                 print "        %-20.20s: %d" % (j, self._data[i][j])
