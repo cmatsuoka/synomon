@@ -47,16 +47,16 @@ class VolumeMonitor(Monitor):
 
     def parse(self, dev):
         m = search("^" + dev + "\s+(\d+)\s+(\d+)", self._cmd)
-        [ total, used ] = int_array(m.group(1, 2))
-        self._data[dev] = [ total, used, 100.0 * used / total ]
+        self._data[dev] = int_array(m.group(1, 2))
 
     def show(self):
 	print "Volume data:"
 	for i in sorted(self._data.keys()):
             print "    %s:" % (i)
-            print "        Total size : %d" % (self._data[i][0])
-            print "        Used size  : %d" % (self._data[i][1])
-            print "        Percent    : %4.1f%%" % (self._data[i][2])
+            print "        Total   : %d" % (self._data[i][0])
+            print "        Used    : %d" % (self._data[i][1])
+            print "        Percent : %4.1f%%" % (100.0 * self._data[i][1]
+                                                 / self._data[i][0])
             print
 
 class HardDiskMonitor(Monitor):
