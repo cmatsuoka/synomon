@@ -10,7 +10,7 @@ conf_dest_dir = "/volume1/web/stats"
 conf_filename = "index.html"
 
 volumes = [ 1, 2, 3, 4, 5 ]
-hds     = [ "/dev/sda", "/dev/sdb" ]
+hds     = [ "sda", "sdb" ]
 ifaces	= [ "eth0" ]
 
 #
@@ -33,7 +33,14 @@ def int_array(array):
 #
 #
 
-class Volume:
+class Monitor:
+    def parse(self):
+        raise NotImplementedError
+
+    def show(self):
+        raise NotImplementedError
+
+class VolumeMonitor(Monitor):
     def __init__(self):
         self._cmd = run_command("df -m")
 	self._data = { }
@@ -52,13 +59,13 @@ class Volume:
             print "        Percent    : %4.1f%%" % (self._data[i][2])
             print
 
-class SmartData:
+class HardDiskMonitor(Monitor):
     def __init__(self, hdlist):
 	self._cmd = { }
 	self._data = { }
 
 	for i in hdlist:
-            self._cmd[i] = run_command("smartctl -d ata -A " + i)
+            self._cmd[i] = run_command("smartctl -d ata -A /dev/" + i)
 	    self._data[i] = { }
 
     def parse(self, hd, parm):
@@ -76,7 +83,7 @@ class SmartData:
                 print "        %-20.20s: %d" % (j, self._data[i][j])
             print
 
-class Interface:
+class NetMonitor(Monitor):
     def __init__(self, iflist):
         self._cmd = { }
         self._data = { }
@@ -126,9 +133,9 @@ if __name__ == "__main__":
 	sys.exit(0)
 
     if sys.argv[1] == "show":
-        vol = Volume()
-        hd = SmartData(hds)
-	iface = Interface(ifaces) 
+        vol = VolumeMonitor()
+        hd = HardDiskMonitor(hds)
+	iface = NetMonitor(ifaces) 
 	parse(hd, vol, iface)
         show(hd, vol, iface)
 
