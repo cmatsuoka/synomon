@@ -26,9 +26,6 @@ def run_command(cmd):
 def search(pattern, string):
     return re.search(pattern, string, re.MULTILINE)
 
-def int_array(array):
-    return [ int(i) for i in array ]
-
 #
 #
 #
@@ -47,7 +44,7 @@ class VolumeMonitor(Monitor):
 
     def parse(self, dev):
         m = search("^" + dev + "\s+(\d+)\s+(\d+)", self._cmd)
-        self._data[dev] = int_array(m.group(1, 2))
+        self._data[dev] = tuple([int(i) for i in m.group(1, 2)])
 
     def show(self):
 	print "Volume data:"
@@ -93,7 +90,7 @@ class NetMonitor(Monitor):
 
     def parse(self, iface):
         m = search("RX bytes:(\d+) .*TX bytes:(\d+)", self._cmd[iface])
-        self._data[iface] = int_array(m.group(1, 2))
+        self._data[iface] = tuple([int(i) for i in m.group(1, 2)])
 
     def show(self):
         print "Network interface data:"
