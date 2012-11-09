@@ -56,14 +56,14 @@ class VolumeMonitor(Monitor):
                                                  / self._data[i][0])
             print
 
-class HardDiskMonitor(Monitor):
+class HDMonitor(Monitor):
     def __init__(self, hdlist):
 	self._cmd = { }
 	self._data = { }
 
-	for i in hdlist:
-            self._cmd[i] = run_command("smartctl -d ata -A /dev/" + i)
-	    self._data[i] = { }
+	for hd in hdlist:
+            self._cmd[hd] = run_command("smartctl -d ata -A /dev/" + hd)
+	    self._data[hd] = { }
 
     def parse(self, hd, parm):
 	if self._cmd[hd] == None:
@@ -79,6 +79,34 @@ class HardDiskMonitor(Monitor):
 	    for j in self._data[i].keys():
                 print "        %-20.20s: %d" % (j, self._data[i][j])
             print
+
+class IOMonitor(Monitor):
+    def __init__(self, hdlist):
+	self._line = { }
+	self._data = { }
+
+	for dev in hdlist:
+	    try:
+                f = open("/sys/block/" + dev + "/stat")
+		self._line[dev] = [ int(i) for i in f.readline().split() ]
+            except:
+		self._line[dev] = [ 0 ] * 11
+
+
+    def parse(self, dev):
+        line = self._line[dev]
+        self._data[dev] = line[2], line[3], line[6], line[7]
+
+    def show(self):
+	print "IO data:"
+	for i in sorted(self._data.keys()):
+            print "    %s:" % (i)
+            print "        Sector reads  : %d" % (self._data[i][0])
+            print "        Read time     : %d ms" % (self._data[i][1])
+            print "        Sector writes : %d" % (self._data[i][2])
+            print "        Write time    : %d ms" % (self._data[i][3])
+            print
+        pass
 
 class NetMonitor(Monitor):
     def __init__(self, iflist):
@@ -103,7 +131,7 @@ class NetMonitor(Monitor):
 #
 #
 
-def parse(hd, vol, iface):
+def parse(hd, vol, io, net):
     vol.parse("/dev/md0")
     
     for i in volumes:
@@ -113,14 +141,16 @@ def parse(hd, vol, iface):
         hd.parse(i, "Temperature_Celsius")
         hd.parse(i, "Power_On_Hours")
         hd.parse(i, "Start_Stop_Count")
-    
-    for i in ifaces:
-        iface.parse(i)
+        io.parse(i)
 
-def show(hd, vol, iface):
+    for i in ifaces:
+        net.parse(i)
+
+def show(hd, vol, io, net):
     hd.show()
     vol.show()
-    iface.show()
+    io.show()
+    net.show()
 
 
 if __name__ == "__main__":
@@ -131,8 +161,9 @@ if __name__ == "__main__":
 
     if sys.argv[1] == "show":
         vol = VolumeMonitor()
-        hd = HardDiskMonitor(hds)
-	iface = NetMonitor(ifaces) 
-	parse(hd, vol, iface)
-        show(hd, vol, iface)
+        hd  = HDMonitor(hds)
+        io  = IOMonitor(hds)
+	net = NetMonitor(ifaces) 
+	parse(hd, vol, io, net)
+        show(hd, vol, io, net)
 
