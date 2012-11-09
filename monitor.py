@@ -44,6 +44,9 @@ class Monitor:
     def show(self):
         raise NotImplementedError
 
+    def get_data(self):
+        raise NotImplementedError
+
 class MemMonitor(Monitor):
     def __init__(self):
         self._data = { }
