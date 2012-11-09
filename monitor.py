@@ -3,15 +3,22 @@
 import subprocess
 import sys
 import re
+import time
+import os
+from pyrrd.rrd import DataSource, RRA, RRD
 
 conf_update_time = 300
 conf_rrd_file = "/opt/etc/monitor.rrd"
 conf_dest_dir = "/volume1/web/stats"
 conf_filename = "index.html"
 
-volumes = [ 1, 2, 3, 4, 5 ]
-hds     = [ "sda", "sdb" ]
-ifaces  = [ "eth0" ]
+volumes  = [ 1, 2, 3, 4, 5 ]
+hds      = [ "sda", "sdb" ]
+lan      = [ "eth0" ]
+
+max_hds  = 2
+max_vols = 9
+max_lan  = 1
 
 #
 #
@@ -59,6 +66,13 @@ class MemMonitor(Monitor):
             print "    %-10.10s: %d kB" % (i, self._data[i])
         print
 
+    def get_data(self):
+        t = ()
+        for i in [ "MemTotal", "MemFree", "Buffers", "Cached", "Active",
+                   "Inactive", "SwapTotal", "SwapFree" ]:
+            t = t + (self._data[i],)
+        return t
+
 class VolMonitor(Monitor):
     def __init__(self):
         self._cmd = run_command("df -m")
@@ -77,6 +91,9 @@ class VolMonitor(Monitor):
             print "        Percent : %4.1f%%" % (100.0 * self._data[i][1]
                                                  / self._data[i][0])
             print
+
+    def get_data(self, dev):
+        return self._data[dev]
 
 class HDMonitor(Monitor):
     def __init__(self, hdlist):
@@ -101,6 +118,9 @@ class HDMonitor(Monitor):
             for j in self._data[i].keys():
                 print "        %-20.20s: %d" % (j, self._data[i][j])
             print
+
+    def get_data(self, hd):
+        return self._data[hd]['Temperature_Celsius']
 
 class IOMonitor(Monitor):
     def __init__(self, hdlist):
@@ -130,6 +150,9 @@ class IOMonitor(Monitor):
             print
         pass
 
+    def get_data(self, dev):
+        return self._data[dev]
+
 class NetMonitor(Monitor):
     def __init__(self, iflist):
         self._cmd = { }
@@ -149,19 +172,73 @@ class NetMonitor(Monitor):
             print "        Rx bytes : %d" % (self._data[i][0])
             print "        Tx bytes : %d" % (self._data[i][1])
             print
+
+    def get_data(self, iface):
+        return self._data[iface]
+
+#
+#
+#
+
+class Rrd:
+    def __init__(self):
+        self._ds = []
+        self._rra = []
+
+    def _add_gauge(self, name):
+        self._ds.append(DataSource(dsName=name, dsType='GAUGE', heartbeat=600))
+
+    def _add_counter(self, name):
+        self._ds.append(DataSource(dsName=name, dsType='COUNTER', heartbeat=600))
+        
+    def create(self):
+        # Memory data
+        for i in [ 'mem_total', 'mem_buffers', 'mem_cached', 'mem_active',
+                   'mem_inactive', 'swap_total', 'swap_free' ]:
+            self._add_gauge(i)
+
+        # Volume data
+        self._add_gauge('sys_total')
+        self._add_gauge('sys_used')
+
+        for i in range(max_vols):
+            vol = "vol%d_" % (i + 1)
+            self._add_gauge(vol + "total")
+            self._add_gauge(vol + "used")
+
+        # Disk data
+        for i in range(max_hds):
+            hd = "sd%c_" % (ord('a') + i)
+            self._add_gauge(hd + "temp")
+            self._add_counter(hd + "reads")
+            self._add_counter(hd + "readtime")
+            self._add_counter(hd + "writes")
+            self._add_counter(hd + "writetime")
+
+        # Network
+        for i in range(max_lan):
+            lan = "eth%d_" % (i)
+            self._add_counter(lan + "rx")
+            self._add_counter(lan + "tx")
+
+	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=1, rows=10))
+	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=6, rows=10))
+
+	my_rrd = RRD(conf_filename, ds=self._ds, rra=self._rra);
+	my_rrd.create()
+
+    def update(self, data):
+        my_rrd = RRD(conf_filename)
+        my_rrd.bufferValue(time.time(), data)
+	my_rrd.update()
 #
 #
 #
 
 def parse(mem, hd, vol, io, net):
-    mem.parse("MemTotal")
-    mem.parse("MemFree")
-    mem.parse("Buffers")
-    mem.parse("Cached")
-    mem.parse("Active")
-    mem.parse("Inactive")
-    mem.parse("SwapTotal")
-    mem.parse("SwapFree")
+    for i in [ "MemTotal", "MemFree", "Buffers", "Cached", "Active",
+               "Inactive", "SwapTotal", "SwapFree" ]:
+        mem.parse(i)
 
     vol.parse("/dev/md0")
     
@@ -174,15 +251,47 @@ def parse(mem, hd, vol, io, net):
         hd.parse(i, "Start_Stop_Count")
         io.parse(i)
 
-    for i in ifaces:
+    for i in lan:
         net.parse(i)
 
 def show(mem, hd, vol, io, net):
     mem.show()
-    hd.show()
-    vol.show()
-    io.show()
     net.show()
+    hd.show()
+    io.show()
+    vol.show()
+
+def get_data(mem, hd, vol, io, net):
+    # Memory data
+    t = mem.get_data()
+
+    # Volume data
+    temp = [ 0 ] * (2 * (max_vols + 1))
+    temp[0], temp[1] = vol.get_data("/dev/md0")
+    for i in volumes:
+        temp[i * 2], temp[i * 2 + 1] = vol.get_data("/dev/vg1/volume_%d" % (i))
+    t = t + tuple(temp)
+
+    # Disk data
+    temp = [ 0 ] * (5 * max_hds)
+    for dev in hds:
+        i = ord(dev[2]) - ord('a')
+	if not 0 <= i < max_hds:
+	    raise ValueError
+        temp[i * 5] = hd.get_data(dev)
+        temp[i * 5 + 1], temp[i * 5 + 2], temp[i * 5 + 3], temp[i * 5 + 4] = io.get_data(dev)
+    t = t + tuple(temp)
+
+    # Network
+    temp = [ 0 ] * (2 * max_lan)
+    for dev in lan:
+        i = ord(dev[3]) - ord('0')
+	if not 0 <= i < max_lan:
+	    raise ValueError
+        temp[i * 2], temp[i * 2 + 1] = net.get_data(dev)
+    t = t + tuple(temp)
+
+    return t
 
 
 if __name__ == "__main__":
@@ -196,7 +305,24 @@ if __name__ == "__main__":
         vol = VolMonitor()
         hd  = HDMonitor(hds)
         io  = IOMonitor(hds)
-        net = NetMonitor(ifaces) 
+        net = NetMonitor(lan) 
         parse(mem, hd, vol, io, net)
         show(mem, hd, vol, io, net)
+
+    elif sys.argv[1] == "update":
+        rrd = Rrd()
+
+	if not os.path.exists(conf_rrd_file):
+            rrd.create()
+
+        mem = MemMonitor()
+        vol = VolMonitor()
+        hd  = HDMonitor(hds)
+        io  = IOMonitor(hds)
+        net = NetMonitor(lan) 
+        parse(mem, hd, vol, io, net)
+
+	data = get_data(mem, hd, vol, io, net)
+
+        rrd.update
 
