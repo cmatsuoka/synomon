@@ -113,7 +113,7 @@ class VolMonitor(Monitor):
 
     def parse(self, dev):
         m = search("^" + dev + "\s+(\d+)\s+(\d+)", self._cmd)
-        self._data[dev] = tuple([int(i) for i in m.group(1, 2)])
+        self._data[dev] = map(int, m.group(1, 2))
 
     def show(self):
         print "Volume data:"
@@ -163,7 +163,7 @@ class IOMonitor(Monitor):
         for dev in hdlist:
             try:
                 with open("/sys/block/" + dev + "/stat") as f:
-                    self._line[dev] = [ int(i) for i in f.readline().split() ]
+                    self._line[dev] = map(int, f.readline().split())
             except:
                 self._line[dev] = [ 0 ] * 11
 
@@ -196,7 +196,7 @@ class NetMonitor(Monitor):
 
     def parse(self, iface):
         m = search("RX bytes:(\d+) .*TX bytes:(\d+)", self._cmd[iface])
-        self._data[iface] = tuple([int(i) for i in m.group(1, 2)])
+        self._data[iface] = map(int, m.group(1, 2))
 
     def show(self):
         print "Network interface data:"
