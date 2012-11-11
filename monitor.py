@@ -53,7 +53,7 @@ class Monitor:
 
 class CPUMonitor(Monitor):
     def __init__(self):
-        self._data = { }
+        self._data = ()
         try:
             with open("/proc/loadavg") as f:
                 self._cmd = f.read()
@@ -65,7 +65,7 @@ class CPUMonitor(Monitor):
             self._data = 0, 0, 0
         else:
             m = search("^([\d.]+) ([\d.]+) ([\d.]+) ", self._cmd)
-            self._data = map(float, m.group(1, 2, 3))
+            self._data = tuple(map(float, m.group(1, 2, 3)))
 
     def show(self):
         print "CPU load:"
@@ -126,7 +126,7 @@ class VolMonitor(Monitor):
             print
 
     def get_data(self, dev):
-        return self._data[dev]
+        return tuple(self._data[dev])
 
 class HDMonitor(Monitor):
     def __init__(self, hdlist):
@@ -184,7 +184,7 @@ class IOMonitor(Monitor):
         pass
 
     def get_data(self, dev):
-        return self._data[dev]
+        return tuple(self._data[dev])
 
 class NetMonitor(Monitor):
     def __init__(self, iflist):
@@ -207,7 +207,7 @@ class NetMonitor(Monitor):
             print
 
     def get_data(self, iface):
-        return self._data[iface]
+        return tuple(self._data[iface])
 
 #
 #
@@ -330,7 +330,8 @@ def get_data(cpu, mem, hd, vol, io, net):
     temp = [ 0 ] * (2 * (max_vols + 1))
     temp[0], temp[1] = vol.get_data("/dev/md0")
     for i in volumes:
-        temp[i * 2], temp[i * 2 + 1] = vol.get_data("/dev/vg1/volume_%d" % (i))
+        path = glob.glob("/dev/vg*/volume_%d" % (i))
+        temp[i * 2], temp[i * 2 + 1] = vol.get_data(path[0])
     t = t + tuple(temp)
 
     # Disk data
