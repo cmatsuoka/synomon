@@ -5,7 +5,10 @@ import sys
 import re
 import time
 import os
+
 from pyrrd.rrd import DataSource, RRA, RRD
+from pyrrd.graph import DEF, CDEF, VDEF, LINE, AREA, GPRINT
+from pyrrd.graph import Graph
 
 conf_update_time = 300
 conf_rrd_file = "/opt/etc/monitor.rrd"
@@ -111,7 +114,7 @@ class HDMonitor(Monitor):
         if self._cmd[hd] == None:
             self._data[hd][parm] = 0
         else:
-            m = search(parm + " .* (\d+)$", self._cmd[hd])
+            m = search(parm + " .* (\d+)( \(.*\))?$", self._cmd[hd])
             self._data[hd][parm] = int(m.group(1))
 
     def show(self):
@@ -196,8 +199,8 @@ class Rrd:
         
     def create(self):
         # Memory data
-        for i in [ 'mem_total', 'mem_buffers', 'mem_cached', 'mem_active',
-                   'mem_inactive', 'swap_total', 'swap_free' ]:
+        for i in [ 'mem_total', 'mem_free', 'mem_buffers', 'mem_cached',
+                   'mem_active', 'mem_inactive', 'swap_total', 'swap_free' ]:
             self._add_gauge(i)
 
         # Volume data
@@ -227,13 +230,22 @@ class Rrd:
 	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=1, rows=10))
 	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=6, rows=10))
 
-	my_rrd = RRD(conf_filename, ds=self._ds, rra=self._rra);
+	my_rrd = RRD(conf_rrd_file, ds=self._ds, rra=self._rra);
 	my_rrd.create()
 
     def update(self, data):
-        my_rrd = RRD(conf_filename)
-        my_rrd.bufferValue(time.time(), data)
+        my_rrd = RRD(conf_rrd_file)
+        my_rrd.bufferValue(time.time(), *data)
 	my_rrd.update()
+
+    def report(self):
+        def1 = DEF(rrdfile=conf_rrd_file, vname='mem', dsName='mem_total')
+        line1 = LINE(value=100, color='#990000', legend='Maximum Allowed')
+
+	g = Graph("/volume1/web/bla.png", vertical_label='km/h')
+        g.data.extend([def1, cdef1, line1])
+        g.write(debug=True)
+
 #
 #
 #
@@ -246,7 +258,7 @@ def parse(mem, hd, vol, io, net):
     vol.parse("/dev/md0")
     
     for i in volumes:
-        vol.parse("/dev/vg1/volume_%d" % (i))
+        vol.parse("/dev/vg*/volume_%d" % (i))
     
     for i in hds:
         hd.parse(i, "Temperature_Celsius")
@@ -326,6 +338,9 @@ if __name__ == "__main__":
         parse(mem, hd, vol, io, net)
 
 	data = get_data(mem, hd, vol, io, net)
+        rrd.update(data)
 
-        rrd.update
-
+    elif sys.argv[1] == "report":
+        rrd = Rrd()
+        rrd.report()
+        
