@@ -258,8 +258,14 @@ class Rrd:
             self._add_counter(lan + "rx")
             self._add_counter(lan + "tx")
 
-	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=1, rows=10))
-	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=6, rows=10))
+        # 5 minute average for daily view (5 day log)
+	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=1, rows=1440))
+
+        # 30 minute average for monthly view (30 day log)
+	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=6, rows=1440))
+
+        # 6 hour average for yearly view (360 day log)
+	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=72, rows=1440))
 
 	my_rrd = RRD(conf_rrd_file, ds=self._ds, rra=self._rra);
 	my_rrd.create()
