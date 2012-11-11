@@ -51,6 +51,32 @@ class Monitor:
     def get_data(self):
         raise NotImplementedError
 
+class CPUMonitor(Monitor):
+    def __init__(self):
+        self._data = { }
+        try:
+            with open("/proc/loadavg") as f:
+                self._cmd = f.read()
+        except:
+            self._cmd = None
+
+    def parse(self):
+        if self._cmd == None:
+            self._data = 0, 0, 0
+        else:
+            m = search("^([\d.]+) ([\d.]+) ([\d.]+) ", self._cmd)
+            self._data = map(float, m.group(1, 2, 3))
+
+    def show(self):
+        print "CPU load:"
+        print "    1m  average :", self._data[0]
+        print "    5m  average :", self._data[1]
+        print "    15m average :", self._data[2]
+        print
+
+    def get_data(self):
+        return self._data
+
 class MemMonitor(Monitor):
     def __init__(self):
         self._data = { }
@@ -199,6 +225,10 @@ class Rrd:
         self._ds.append(DataSource(dsName=name, dsType='COUNTER', heartbeat=600))
         
     def create(self):
+        # CPU load data
+        for i in [ 'cpu_load1', 'cpu_load5', 'cpu_load15' ]:
+            self._add_gauge(i)
+
         # Memory data
         for i in [ 'mem_total', 'mem_free', 'mem_buffers', 'mem_cached',
                    'mem_active', 'mem_inactive', 'swap_total', 'swap_free' ]:
@@ -251,7 +281,9 @@ class Rrd:
 #
 #
 
-def parse(mem, hd, vol, io, net):
+def parse(cpu, mem, hd, vol, io, net):
+    cpu.parse()
+
     for i in [ "MemTotal", "MemFree", "Buffers", "Cached", "Active",
                "Inactive", "SwapTotal", "SwapFree" ]:
         mem.parse(i)
@@ -271,16 +303,20 @@ def parse(mem, hd, vol, io, net):
     for i in lan:
         net.parse(i)
 
-def show(mem, hd, vol, io, net):
+def show(cpu, mem, hd, vol, io, net):
+    cpu.show()
     mem.show()
     net.show()
     hd.show()
     io.show()
     vol.show()
 
-def get_data(mem, hd, vol, io, net):
+def get_data(cpu, mem, hd, vol, io, net):
+    # CPU load data
+    t = cpu.get_data()
+
     # Memory data
-    t = mem.get_data()
+    t = t + mem.get_data()
 
     # Volume data
     temp = [ 0 ] * (2 * (max_vols + 1))
@@ -318,13 +354,14 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if sys.argv[1] == "show":
+        cpu = CPUMonitor()
         mem = MemMonitor()
         vol = VolMonitor()
         hd  = HDMonitor(hds)
         io  = IOMonitor(hds)
         net = NetMonitor(lan) 
-        parse(mem, hd, vol, io, net)
-        show(mem, hd, vol, io, net)
+        parse(cpu, mem, hd, vol, io, net)
+        show(cpu, mem, hd, vol, io, net)
 
     elif sys.argv[1] == "update":
         rrd = Rrd()
@@ -332,14 +369,15 @@ if __name__ == "__main__":
 	if not os.path.exists(conf_rrd_file):
             rrd.create()
 
+        cpu = CPUMonitor()
         mem = MemMonitor()
         vol = VolMonitor()
         hd  = HDMonitor(hds)
         io  = IOMonitor(hds)
         net = NetMonitor(lan) 
-        parse(mem, hd, vol, io, net)
+        parse(cpu, mem, hd, vol, io, net)
 
-	data = get_data(mem, hd, vol, io, net)
+	data = get_data(cpu, mem, hd, vol, io, net)
         rrd.update(data)
 
     elif sys.argv[1] == "report":
