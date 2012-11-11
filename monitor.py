@@ -12,7 +12,7 @@ from pyrrd.graph import DEF, CDEF, VDEF, LINE, AREA, GPRINT
 from pyrrd.graph import Graph
 
 conf_update_time = 300
-conf_rrd_file = "/opt/etc/monitor.rrd"
+conf_rrd_file = "/opt/var/lib/monitor.rrd"
 conf_dest_dir = "/volume1/web/stats"
 conf_filename = "index.html"
 
@@ -267,6 +267,8 @@ class Rrd:
         # 6 hour average for yearly view (360 day log)
 	self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=72, rows=1440))
 
+	print "Create %s" % (conf_rrd_file)
+
 	my_rrd = RRD(conf_rrd_file, ds=self._ds, rra=self._rra);
 	my_rrd.create()
 
@@ -390,3 +392,6 @@ if __name__ == "__main__":
         rrd = Rrd()
         rrd.report()
         
+    else:
+        print "Invalid command %s" % (sys.argv[1])
+        sys.exit(1)
