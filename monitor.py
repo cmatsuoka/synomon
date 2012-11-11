@@ -5,6 +5,7 @@ import sys
 import re
 import time
 import os
+import glob
 
 from pyrrd.rrd import DataSource, RRA, RRD
 from pyrrd.graph import DEF, CDEF, VDEF, LINE, AREA, GPRINT
@@ -15,12 +16,12 @@ conf_rrd_file = "/opt/etc/monitor.rrd"
 conf_dest_dir = "/volume1/web/stats"
 conf_filename = "index.html"
 
-volumes  = [ 1, 2, 3, 4, 5 ]
+volumes  = [ 1, 2, 3, 4, 5, 6 ]
 hds      = [ "sda", "sdb" ]
 lan      = [ "eth0" ]
 
 max_hds  = 2
-max_vols = 9
+max_vols = 10
 max_lan  = 1
 
 #
@@ -258,7 +259,8 @@ def parse(mem, hd, vol, io, net):
     vol.parse("/dev/md0")
     
     for i in volumes:
-        vol.parse("/dev/vg*/volume_%d" % (i))
+        path=glob.glob("/dev/vg*/volume_%d" % (i))
+        vol.parse(path[0])
     
     for i in hds:
         hd.parse(i, "Temperature_Celsius")
