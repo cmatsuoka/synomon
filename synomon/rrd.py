@@ -141,6 +141,12 @@ class Rrd:
 
     def report(self, dest, hds, vols, lan):
 
+	# Network I/O 
+	r = Report(self._rrd_file)
+        r.area('eth0_rx', '#00c000', 'Network rx')
+        r.line('eth0_tx', '#0000c0', 'Network tx')
+	r.day_graph(dest + '/g0.png', 'Bytes')
+
 	# CPU load graph
 	r = Report(self._rrd_file)
         r.area('cpu_load15', '#00c000', '15 min')
@@ -156,7 +162,7 @@ class Rrd:
 	r = Report(self._rrd_file)
         for i in hds:
             j = ord(i[2]) - ord('a')
-            r.line("%s_temp" % (i), color1[j], "%s_temperature" % (i))
+            r.line("%s_temp" % (i), color1[j], "HD%d temperature" % (j))
 	r.day_graph(dest + '/g3.png', 'Celsius')
 
         # HD I/O graph
@@ -164,8 +170,8 @@ class Rrd:
 
         for i in hds:
             j = ord(i[2]) - ord('a')
-            r.line("%s_reads"  % (i), color1[j], "%s reads"  % (i))
-            r.line("%s_writes" % (i), color2[j], "%s writes" % (i))
+            r.line("%s_reads"  % (i), color1[j], "HD%d reads"  % (j))
+            r.line("%s_writes" % (i), color2[j], "HD%d writes" % (j))
 	r.day_graph(dest + '/g4.png', 'Sectors')
 
         # Volume usage graph
