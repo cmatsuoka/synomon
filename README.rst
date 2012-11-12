@@ -1,3 +1,5 @@
+NAS monitor script
+==================
 
 This is a work-in-progress monitor script I'm using on my Synology
 DiskStation DS212j NAS. It gathers data from different sources and
@@ -14,12 +16,12 @@ Things you need in order to run the monitor:
 
 * Python: it can be installed from Package Center
 
-* RRDtool ::
-   > ipkg install rrdtool
+* RRDtool: ::
+    > ipkg install rrdtool
 
-* PyRRD_ ::
-   > curl -k https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
-   > pip install PyRRD
+* PyRRD_: ::
+    > curl -k https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
+    > pip install PyRRD
 
 
 Configuration
