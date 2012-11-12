@@ -23,7 +23,8 @@ max_lan  = 1
 #
 #
 
-def parse(cpu, mem, hd, vol, io, net):
+def parse(cnt, cpu, mem, hd, vol, io, net):
+    cnt.parse()
     cpu.parse()
 
     for i in [ "MemTotal", "MemFree", "Buffers", "Cached", "Active",
@@ -45,7 +46,8 @@ def parse(cpu, mem, hd, vol, io, net):
     for i in lan:
         net.parse(i)
 
-def show(cpu, mem, hd, vol, io, net):
+def show(cnt, cpu, mem, hd, vol, io, net):
+    cnt.show()
     cpu.show()
     mem.show()
     net.show()
@@ -53,9 +55,12 @@ def show(cpu, mem, hd, vol, io, net):
     io.show()
     vol.show()
 
-def get_data(cpu, mem, hd, vol, io, net):
+def get_data(cnt, cpu, mem, hd, vol, io, net):
+    # Jiffy counter data
+    t = cnt.get_data()
+
     # CPU load data
-    t = cpu.get_data()
+    t = t + cpu.get_data()
 
     # Memory data
     t = t + mem.get_data()
@@ -98,14 +103,15 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if sys.argv[1] == "show":
-        cpu = CPUMonitor()
+        cnt = IntMonitor()
+        cpu = LoadMonitor()
         mem = MemMonitor()
         vol = VolMonitor()
         hd  = HDMonitor(hds)
         io  = IOMonitor(hds)
         net = NetMonitor(lan) 
-        parse(cpu, mem, hd, vol, io, net)
-        show(cpu, mem, hd, vol, io, net)
+        parse(cnt, cpu, mem, hd, vol, io, net)
+        show(cnt, cpu, mem, hd, vol, io, net)
 
     elif sys.argv[1] == "update":
         rrd = Rrd(conf_rrd_file)
@@ -113,15 +119,16 @@ if __name__ == "__main__":
 	if not os.path.exists(conf_rrd_file):
             rrd.create(max_vols, max_hds, max_lan)
 
-        cpu = CPUMonitor()
+        cnt = IntMonitor()
+        cpu = LoadMonitor()
         mem = MemMonitor()
         vol = VolMonitor()
         hd  = HDMonitor(hds)
         io  = IOMonitor(hds)
         net = NetMonitor(lan) 
-        parse(cpu, mem, hd, vol, io, net)
+        parse(cnt, cpu, mem, hd, vol, io, net)
 
-	data = get_data(cpu, mem, hd, vol, io, net)
+	data = get_data(cnt, cpu, mem, hd, vol, io, net)
         rrd.update(data)
 
     elif sys.argv[1] == "report":

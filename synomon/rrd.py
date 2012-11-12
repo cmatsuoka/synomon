@@ -85,8 +85,13 @@ class Rrd:
         self._ds.append(DataSource(dsName=name, dsType='COUNTER', heartbeat=600))
         
     def create(self, max_vols, max_hds, max_lan):
+        # Stat data
+        for i in [ 'stat_user', 'stat_nice', 'stat_system', 'stat_idle',
+                   'stat_iowait', 'stat_irq', 'stat_softirq' ]:
+            self._add_counter(i)
+
         # CPU load data
-        for i in [ 'cpu_load1', 'cpu_load5', 'cpu_load15' ]:
+        for i in [ 'load_1', 'load_5', 'load_15' ]:
             self._add_gauge(i)
 
         # Memory data
@@ -149,8 +154,8 @@ class Rrd:
 
 	# CPU load graph
 	r = Report(self._rrd_file)
-        r.area('cpu_load15', '#00c000', '15 min')
-        r.line('cpu_load1', '#0000c0', '1 min')
+        r.area('load_15', '#00c000', '15 min')
+        r.line('load_1', '#0000c0', '1 min')
 	r.day_graph(dest + '/g1.png', 'Active\ tasks')
 
 	# Memory usage graph

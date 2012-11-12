@@ -20,7 +20,7 @@ class Monitor:
     def get_data(self):
         raise NotImplementedError
 
-class CPUMonitor(Monitor):
+class LoadMonitor(Monitor):
     def __init__(self):
         self._data = ()
         try:
@@ -41,6 +41,37 @@ class CPUMonitor(Monitor):
         print "    1m  average :", self._data[0]
         print "    5m  average :", self._data[1]
         print "    15m average :", self._data[2]
+        print
+
+    def get_data(self):
+        return self._data
+
+class IntMonitor(Monitor):
+    def __init__(self):
+        self._data = ()
+        try:
+            with open("/proc/stat") as f:
+                self._cmd = f.readline()
+        except:
+            self._cmd = None
+
+    def parse(self):
+        if self._cmd == None:
+            self._data = 0, 0, 0, 0, 0, 0, 0
+        else:
+            m = self._search("cpu\s+(\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+)",
+                             self._cmd)
+            self._data = tuple(map(int, m.group(1, 2, 3, 4, 5, 6, 7)))
+
+    def show(self):
+        print "Jiffy counters:"
+        print "    User    :", self._data[0]
+        print "    Nice    :", self._data[1]
+        print "    System  :", self._data[2]
+        print "    Idle    :", self._data[3]
+        print "    IOwait  :", self._data[4]
+        print "    IRQ     :", self._data[5]
+        print "    Softirq :", self._data[6]
         print
 
     def get_data(self):
