@@ -74,7 +74,7 @@ def get_data(cpu, mem, hd, vol, io, net):
         i = ord(dev[2]) - ord('a')
 	if not 0 <= i < max_hds:
 	    raise ValueError
-        j = i * 5
+        j = i * 7
         temp[j    ], temp[j + 1], temp[j + 2] = hd.get_data(dev)
         temp[j + 3], temp[j + 4], temp[j + 5], temp[j + 6] = io.get_data(dev)
     t = t + tuple(temp)
