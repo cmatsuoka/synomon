@@ -153,7 +153,9 @@ class HDMonitor(Monitor):
             print
 
     def get_data(self, hd):
-        return self._data[hd]['Temperature_Celsius']
+        return (self._data[hd]['Temperature_Celsius'],
+                self._data[hd]['Power_On_Hours'],
+                self._data[hd]['Start_Stop_Count'])
 
 class IOMonitor(Monitor):
     def __init__(self, hdlist):
@@ -247,6 +249,8 @@ class Rrd:
         for i in range(max_hds):
             hd = "sd%c_" % (ord('a') + i)
             self._add_gauge(hd + "temp")
+            self._add_gauge(hd + "hours")
+            self._add_gauge(hd + "starts")
             self._add_counter(hd + "reads")
             self._add_counter(hd + "readtime")
             self._add_counter(hd + "writes")
@@ -335,13 +339,14 @@ def get_data(cpu, mem, hd, vol, io, net):
     t = t + tuple(temp)
 
     # Disk data
-    temp = [ 0 ] * (5 * max_hds)
+    temp = [ 0 ] * (7 * max_hds)
     for dev in hds:
         i = ord(dev[2]) - ord('a')
 	if not 0 <= i < max_hds:
 	    raise ValueError
-        temp[i * 5] = hd.get_data(dev)
-        temp[i * 5 + 1], temp[i * 5 + 2], temp[i * 5 + 3], temp[i * 5 + 4] = io.get_data(dev)
+        j = i * 5
+        temp[j    ], temp[j + 1], temp[j + 2] = hd.get_data(dev)
+        temp[j + 3], temp[j + 4], temp[j + 5], temp[j + 6] = io.get_data(dev)
     t = t + tuple(temp)
 
     # Network
