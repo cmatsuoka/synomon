@@ -8,18 +8,18 @@ Quick start
 
 Things you need in order to run the monitor:
 
- * Bootstrap: you'll need a number of third-party packages available on
-   a bootstrapped DiskStation. Check this bootstrapping-guide_ to learn
-   how to do it.
+* Bootstrap: you'll need a number of third-party packages available on
+  a bootstrapped DiskStation. Check this bootstrapping-guide_ to learn
+  how to do it.
 
- * Python: it can be installed from Package Center
+* Python: it can be installed from Package Center
 
- * RRDtool ::
-    > ipkg install rrdtool
+* RRDtool ::
+   > ipkg install rrdtool
 
- * PyRRD_ ::
-    > curl -k https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
-    > pip install PyRRD
+* PyRRD_ ::
+   > curl -k https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
+   > pip install PyRRD
 
 
 Configuration
