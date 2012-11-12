@@ -5,6 +5,7 @@
   body {
     font-family: Verdana,Arial,sans-serif;
     background: #c0c0c0;
+    text-align: center;
   } 
   .twocolumn {
     -moz-column-count: 2;
