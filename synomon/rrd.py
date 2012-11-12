@@ -4,6 +4,28 @@ from pyrrd.rrd import DataSource, RRA, RRD
 from pyrrd.graph import DEF, CDEF, VDEF, LINE, AREA, GPRINT
 from pyrrd.graph import Graph
 
+class Report:
+    def __init__(self, rrd_file):
+        self._data = []
+        self._rrd_file = rrd_file
+
+    def line(self, name, color, legend):
+        def1 = DEF(rrdfile=self._rrd_file, vname=name, dsName=name)
+        line1 = LINE(defObj=def1, color=color, legend=legend) 
+	self._data = self._data + [ def1, line1 ]
+
+    def area(self, name, color, legend):
+        def1 = DEF(rrdfile=self._rrd_file, vname=name, dsName=name)
+        line1 = AREA(defObj=def1, color=color, legend=legend) 
+	self._data = self._data + [ def1, line1 ]
+
+    def day_graph(self, path, label):
+	now = int(time.time())
+	time_day = 60 * 60 * 24
+	g = Graph(path, start=now-time_day, end=now, vertical_label=label)
+        g.data.extend(self._data)
+        g.write(debug=True)
+
 class Rrd:
     def __init__(self, rrd_file):
         self._ds = []
@@ -72,10 +94,25 @@ class Rrd:
 	my_rrd.update()
 
     def report(self):
-        def1 = DEF(rrdfile=conf_rrd_file, vname='mem', dsName='mem_total')
-        line1 = LINE(value=100, color='#990000', legend='Maximum Allowed')
 
-	g = Graph("/volume1/web/bla.png", vertical_label='km/h')
-        g.data.extend([def1, cdef1, line1])
-        g.write(debug=True)
+	# CPU load graph
+	r = Report(self._rrd_file)
+        r.area('cpu_load15', '#00c000', '15 min')
+        r.line('cpu_load5', '#0000c0', '5 min')
+        r.line('cpu_load1', '#c00000', '1 min')
+	r.day_graph('/volume1/web/bla.png', 'Active\ tasks')
+
+        # HD temperature graph
+	r = Report(self._rrd_file)
+        r.line('sda_temp', '#c00000', 'HD1 temperature')
+        r.line('sdb_temp', '#0000c0', 'HD2 temperature')
+	r.day_graph('/volume1/web/bla2.png', 'Celsius')
+
+        # HD I/O graph
+	r = Report(self._rrd_file)
+        r.line('sda_reads',  '#c00000', 'HD1 reads')
+        r.line('sda_writes', '#0000c0', 'HD1 writes')
+        r.line('sdb_reads',  '#c0c000', 'HD2 reads')
+        r.line('sdb_writes', '#00c0c0', 'HD2 writes')
+	r.day_graph('/volume1/web/bla3.png', 'Sectors')
 
