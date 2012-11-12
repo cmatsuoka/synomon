@@ -162,7 +162,7 @@ class Rrd:
 	r = Report(self._rrd_file)
         for i in hds:
             j = ord(i[2]) - ord('a')
-            r.line("%s_temp" % (i), color1[j], "HD%d temperature" % (j))
+            r.line("%s_temp" % (i), color1[j], "HD%d temperature" % (j + 1))
 	r.day_graph(dest + '/g3.png', 'Celsius')
 
         # HD I/O graph
@@ -170,8 +170,8 @@ class Rrd:
 
         for i in hds:
             j = ord(i[2]) - ord('a')
-            r.line("%s_reads"  % (i), color1[j], "HD%d reads"  % (j))
-            r.line("%s_writes" % (i), color2[j], "HD%d writes" % (j))
+            r.line("%s_reads"  % (i), color1[j], "HD%d reads"  % (j + 1))
+            r.line("%s_writes" % (i), color2[j], "HD%d writes" % (j + 1))
 	r.day_graph(dest + '/g4.png', 'Sectors')
 
         # Volume usage graph
