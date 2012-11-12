@@ -10,7 +10,6 @@ from synomon.rrd import *
 conf_update_time = 300
 conf_rrd_file = "/opt/var/lib/monitor.rrd"
 conf_dest_dir = "/volume1/web/stats"
-conf_filename = "index.html"
 
 volumes  = [ 1, 2, 3, 4, 5, 6 ]
 hds      = [ "sda", "sdb" ]
@@ -126,8 +125,9 @@ if __name__ == "__main__":
         rrd.update(data)
 
     elif sys.argv[1] == "report":
+        print "Generating report..."
         rrd = Rrd(conf_rrd_file)
-        rrd.report()
+        rrd.report(conf_dest_dir, hds, volumes, lan)
         
     else:
         print "Invalid command %s" % (sys.argv[1])
