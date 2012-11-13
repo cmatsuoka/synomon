@@ -31,11 +31,10 @@
 <body>
 
 <?php
-  putenv("PATH=/opt/bin:" . $_ENV["PATH"]);
-  exec('/root/monitor/monitor.py report');
+  shell_exec('PATH=/opt/bin:$PATH /root/monitor/monitor.py report');
 
-  $host = exec('hostname');
-  $date = exec('/bin/date');
+  $host = gethostname();
+  $date = getdate();
   $client = $_SERVER['REMOTE_ADDR'];
   echo "<h2>$host</h2>";
 ?>
@@ -72,7 +71,9 @@
 <p>
 
 <?php
-  echo "<small>$date<br>Connect from $client</small>";
+  echo "<small>$date[month] $date[mday], $date[year] ";
+  echo "$date[hours]:$date[minutes]:$date[seconds]<br>";
+  echo "Connect from $client</small>";
 ?>
 
 </body>
