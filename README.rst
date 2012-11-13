@@ -17,9 +17,11 @@ Things you need in order to run the monitor:
 * Python: it can be installed from Package Center
 
 * RRDtool: ::
+
     > ipkg install rrdtool
 
 * PyRRD_: ::
+
     > curl -k https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
     > pip install PyRRD
 

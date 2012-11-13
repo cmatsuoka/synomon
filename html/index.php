@@ -31,6 +31,7 @@
 <body>
 
 <?php
+  putenv("PATH=/opt/bin:" . $_ENV["PATH"]);
   exec('/root/monitor/monitor.py report');
 
   $host = exec('hostname');
