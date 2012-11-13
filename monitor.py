@@ -6,6 +6,7 @@ import glob
 
 from synomon.monitor import *
 from synomon.rrd import *
+from synomon.graph import Graph
 
 conf_update_time = 300
 conf_rrd_file = "/opt/var/lib/monitor.rrd"
@@ -133,8 +134,13 @@ if __name__ == "__main__":
 
     elif sys.argv[1] == "report":
         print "Generating report..."
-        rrd = Rrd(conf_rrd_file)
-        rrd.report(conf_dest_dir, hds, volumes, lan)
+        graph = Graph(conf_rrd_file)
+        graph.network(conf_dest_dir + '/g0.png')
+        graph.load(conf_dest_dir + '/g1.png')
+        graph.memory(conf_dest_dir + '/g2.png')
+        graph.hdtemp(hds, conf_dest_dir + '/g3.png')
+        graph.hdio(hds, conf_dest_dir + '/g4.png')
+        graph.volume(volumes, conf_dest_dir + '/g5.png')
         
     else:
         print "Invalid command %s" % (sys.argv[1])
