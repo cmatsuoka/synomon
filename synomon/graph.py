@@ -25,6 +25,29 @@ class Report:
         line1 = AREA(defObj=def1, color=color, legend=legend) 
 	self._data = self._data + [ def1, line1 ]
 
+    def cpu(self, c1, c2, c3, c5):
+        def1 = self._def(vname='user'  , dsName='stat_user')
+        def2 = self._def(vname='nice'  , dsName='stat_nice')
+        def3 = self._def(vname='system', dsName='stat_system')
+        def4 = self._def(vname='idle'  , dsName='stat_idle')
+        def5 = self._def(vname='iowait', dsName='stat_iowait')
+        def6 = self._def(vname='irq'   , dsName='stat_irq')
+        def7 = self._def(vname='softirq', dsName='stat_softirq')
+	cdef = CDEF(vname='all', rpn='user,nice,+,system,+,idle,+,iowait,+,irq,+,softirq,+')
+        cdef1 = CDEF(vname='puser'  , rpn='100,user,*,all,/')
+        cdef2 = CDEF(vname='pnice'  , rpn='100,nice,*,all,/')
+        cdef3 = CDEF(vname='psystem', rpn='100,system,*,all,/')
+        cdef5 = CDEF(vname='piowait', rpn='100,iowait,*,all,/')
+
+	area1 = AREA(defObj=cdef1, color=c1, legend='User', stack=True)
+	area2 = AREA(defObj=cdef2, color=c2, legend='Nice', stack=True)
+	area3 = AREA(defObj=cdef3, color=c3, legend='System', stack=True)
+	area5 = AREA(defObj=cdef5, color=c5, legend='IOwait', stack=True)
+
+        self._data = self._data + [ def1, def2, def3, def4, def5, def6, def7,
+                                    cdef, cdef1, cdef2, cdef3, cdef5, area3,
+                                    area1, area2, area5 ]
+
     def memory(self, c1, c2, c3, c4):
         def1 = self._def(vname='tot', dsName='mem_total')
         def2 = self._def(vname='fre', dsName='mem_free')
@@ -80,6 +103,12 @@ class Graph:
         r.line('eth0_tx', '#0000c0', 'Network tx')
 	r.day_graph(filename, 'Bytes')
 
+    def cpu(self, filename):
+	''' CPU stats graph '''
+	r = Report(self._rrd_file)
+        r.cpu('#00c000', '#c0c000', '#0000c0', '#c00000')
+	r.day_graph(filename, 'Percentage')
+
     def load(self, filename):
 	''' CPU load graph '''
 	r = Report(self._rrd_file)
@@ -109,6 +138,15 @@ class Graph:
             r.line("%s_reads"  % (i), color1[j], "HD%d reads"  % (j + 1))
             r.line("%s_writes" % (i), color2[j], "HD%d writes" % (j + 1))
 	r.day_graph(filename, 'Sectors')
+
+    def hdtime(self, hds, filename):
+        ''' HD I/O graph '''
+	r = Report(self._rrd_file)
+        for i in hds:
+            j = ord(i[2]) - ord('a')
+            r.line("%s_readtime"  % (i), color1[j], "HD%d read"  % (j + 1))
+            r.line("%s_writetime" % (i), color2[j], "HD%d write" % (j + 1))
+	r.day_graph(filename, 'Milliseconds')
 
     def volume(self, vols, filename):
         ''' Volume usage graph '''

@@ -45,27 +45,33 @@
 <h3>Network</h3>
 <img src="g0.png">
 
-<h3>CPU load</h3>
+<h3>CPU stat</h3>
 <img src="g1.png">
 
-<h3>Memory usage</h3>
+<h3>CPU load</h3>
 <img src="g2.png">
 
-<h3>Disk temperature</h3>
+<h3>Memory usage</h3>
 <img src="g3.png">
 
-<h3>Disk I/O</h3>
+<h3>Disk temperature</h3>
 <img src="g4.png">
 
-<h3>Volume usage</h3>
+<h3>Disk I/O</h3>
 <img src="g5.png">
+
+<h3>Disk I/O time</h3>
+<img src="g6.png">
+
+<h3>Volume usage</h3>
+<img src="g7.png">
 
 </div>
 
 <p>
 
 <?php
-  echo "<small><em>$date from $client</em></small>";
+  echo "<small>$date<br>Connect from $client</small>";
 ?>
 
 </body>

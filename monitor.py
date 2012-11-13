@@ -136,11 +136,13 @@ if __name__ == "__main__":
         print "Generating report..."
         graph = Graph(conf_rrd_file)
         graph.network(conf_dest_dir + '/g0.png')
-        graph.load(conf_dest_dir + '/g1.png')
-        graph.memory(conf_dest_dir + '/g2.png')
-        graph.hdtemp(hds, conf_dest_dir + '/g3.png')
-        graph.hdio(hds, conf_dest_dir + '/g4.png')
-        graph.volume(volumes, conf_dest_dir + '/g5.png')
+        graph.cpu(conf_dest_dir + '/g1.png')
+        graph.load(conf_dest_dir + '/g2.png')
+        graph.memory(conf_dest_dir + '/g3.png')
+        graph.hdtemp(hds, conf_dest_dir + '/g4.png')
+        graph.hdio(hds, conf_dest_dir + '/g5.png')
+        graph.hdtime(hds, conf_dest_dir + '/g6.png')
+        graph.volume(volumes, conf_dest_dir + '/g7.png')
         
     else:
         print "Invalid command %s" % (sys.argv[1])
