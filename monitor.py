@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     elif sys.argv[1] == "report":
         print "Generating report..."
-        graph = Graph(conf_rrd_file, height=170)
+        graph = Graph(conf_rrd_file, height=150)
         graph.network(conf_dest_dir + '/g0.png')
         graph.cpu(conf_dest_dir + '/g1.png')
         graph.load(conf_dest_dir + '/g2.png')

@@ -1,5 +1,3 @@
-import time
-
 from pyrrd.graph import DEF, CDEF, VDEF, LINE, AREA, GPRINT
 from pyrrd.graph import Graph as RRDGraph
 
@@ -85,9 +83,7 @@ class Report:
 	    self._data = self._data + [ def1[i], def2[i], cdef[i], line[i] ]
 
     def day_graph(self, path, label, size=(0,0)):
-	now = int(time.time())
-	time_day = 60 * 60 * 24
-	g = RRDGraph(path, start=now-time_day, end=now, vertical_label=label)
+	g = RRDGraph(path, start=-3600*24, end=-1, vertical_label=label)
         g.data.extend(self._data)
         if size[0] > 0:
             g.width = size[0]
