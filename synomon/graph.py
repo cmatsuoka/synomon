@@ -87,7 +87,7 @@ class Report:
             def2.append(self._def(vname="v%du" % (i), dsName=name_used))
             cdef.append(CDEF(vname="v%dp" % (i),
                              rpn="v%du,100,*,v%dt,/" % (i, i)))
-	    line.append(LINE(defObj=cdef[i], color=color1[i],
+	    line.append(LINE(defObj=cdef[i], color=color1[i], width=2,
                              legend="Vol%d" % (i)))
 
         for i in [ 0 ] + vols:
