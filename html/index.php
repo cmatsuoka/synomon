@@ -71,9 +71,7 @@
 <p>
 
 <?php
-  echo "<small>$date[month] $date[mday], $date[year] ";
-  echo "$date[hours]:$date[minutes]:$date[seconds]<br>";
-  echo "Connect from $client</small>";
+  echo "<small>", strftime("%c"), "<br>Connect from $client</small>";
 ?>
 
 </body>
