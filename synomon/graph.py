@@ -46,6 +46,17 @@ class Report:
                                     cdef, cdef1, cdef2, cdef3, cdef5, area3,
                                     area1, area2, area5 ]
 
+    def hdtemp(self, hds):
+        for i in hds:
+            j = ord(i[2]) - ord('a')
+            name = "%s_temp" % (i)
+            legend =  "HD%d temperature" % (j + 1)
+            def1 = self._def(vname=name, dsName=name)
+            line1 = LINE(defObj=def1, color=color1[j] + '40') 
+            cdef1 = CDEF(vname=name + '_t', rpn="%s,3000,TREND" % (name))
+            line2 = LINE(defObj=cdef1, color=color1[j], width=2, legend=legend)
+            self._data = self._data + [ def1, line1, cdef1, line2 ]
+
     def memory(self, c1, c2, c3, c4):
         def1 = self._def(vname='tot', dsName='mem_total')
         def2 = self._def(vname='fre', dsName='mem_free')
@@ -133,16 +144,14 @@ class Graph:
 	''' Memory usage graph '''
 	self._set_size(width, height)
 	r = Report(self._rrd_file)
-	r.memory('#00c000', '#0000c0', '#00c0c0', '#c00000')
+	r.memory('#00c000', '#0000c0', '#00c0c0c0', '#c00000')
 	r.day_graph(filename, 'KBytes', self._size)
 
     def hdtemp(self, hds, filename, width=0, height=0):
         ''' HD temperature graph '''
 	self._set_size(width, height)
 	r = Report(self._rrd_file)
-        for i in hds:
-            j = ord(i[2]) - ord('a')
-            r.line("%s_temp" % (i), color1[j], "HD%d temperature" % (j + 1))
+	r.hdtemp(hds)
 	r.day_graph(filename, 'Celsius', self._size)
 
     def hdio(self, hds, filename, width=0, height=0):
