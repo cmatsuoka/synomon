@@ -7,12 +7,14 @@
     background: #c0c0c0;
     text-align: center;
   } 
-  .twocolumn {
-    -moz-column-count: 2;
-    -webkit-column-count: 2;
-    column-count: 2;
-    column-fill: balance;
-  }
+  @media (min-width: 1024px) {
+    .twocolumn {
+      -moz-column-count: 2;
+      -webkit-column-count: 2;
+      column-count: 2;
+      column-fill: balance;
+    }
+  } 
   h2 {
     text-align: center;
   }
