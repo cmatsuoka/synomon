@@ -1,22 +1,33 @@
 # -*- coding: utf-8 -*-
 
+'''
+RRD access
+
+This module encapsulates RRD creation and updates using pyrrd. 
+'''
+
 import time
 
 from pyrrd.rrd import DataSource, RRA, RRD
 
 class Rrd:
+    ''' RRD database access '''
     def __init__(self, rrd_file):
         self._ds = []
         self._rra = []
         self._rrd_file = rrd_file
 
     def add_gauge(self, name):
+        ''' Create a DS with type GAUGE '''
         self._ds.append(DataSource(dsName=name, dsType='GAUGE', heartbeat=600))
 
     def add_counter(self, name):
-        self._ds.append(DataSource(dsName=name, dsType='COUNTER', heartbeat=600))
+        ''' Create a DS with type COUNTER '''
+        self._ds.append(DataSource(dsName=name, dsType='COUNTER',
+                                                heartbeat=600))
         
     def create(self):
+        ''' Create the RRD '''
         # 5 minute average for daily view (5 day log)
         self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=1, rows=1440))
 
@@ -27,11 +38,11 @@ class Rrd:
         self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=72, rows=1440))
 
         print "Create %s" % (self._rrd_file)
-
-        my_rrd = RRD(self._rrd_file, ds=self._ds, rra=self._rra);
+        my_rrd = RRD(self._rrd_file, ds=self._ds, rra=self._rra)
         my_rrd.create()
 
     def update(self, data):
+        ''' Update the RRD '''
         my_rrd = RRD(self._rrd_file)
         my_rrd.bufferValue(time.time(), *data)
         my_rrd.update()
