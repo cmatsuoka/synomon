@@ -56,7 +56,7 @@ class UptimeMonitor(Monitor):
         rrd = Rrd(filename)
         rrd.add_counter('uptime_secs')
         rrd.add_counter('idle')
-	rrd.create()
+        rrd.create()
 
     def update(self, path):
         self._parse()
@@ -91,7 +91,7 @@ class LoadMonitor(Monitor):
         rrd = Rrd(filename)
         for i in [ 'load_1', 'load_5', 'load_15' ]:
             rrd.add_gauge(i)
-	rrd.create()
+        rrd.create()
 
     def update(self, path):
         self._parse()
@@ -116,7 +116,7 @@ class StatMonitor(Monitor):
             self._data = tuple(map(int, m.group(1, 2, 3, 4, 5, 6, 7)))
 
     def show(self):
-	self._parse()
+        self._parse()
         print 'CPU counters:'
         print '    User    :', self._data[0]
         print '    Nice    :', self._data[1]
@@ -132,10 +132,10 @@ class StatMonitor(Monitor):
         for i in [ 'stat_user', 'stat_nice', 'stat_system', 'stat_idle',
                    'stat_iowait', 'stat_irq', 'stat_softirq' ]:
             rrd.add_counter(i)
-	rrd.create()
+        rrd.create()
 
     def update(self, path):
-	self._parse()
+        self._parse()
         self._rrd_update(path + '/stat.rrd')
         
 
@@ -161,7 +161,7 @@ class MemMonitor(Monitor):
         self._data = t
 
     def show(self):
-	self._parse()
+        self._parse()
         print 'Memory data:'
         print '    MemTotal  :', self._data[0]
         print '    MemFree   :', self._data[1]
@@ -178,10 +178,10 @@ class MemMonitor(Monitor):
         for i in [ 'mem_total', 'mem_free', 'mem_buffers', 'mem_cached',
                    'mem_active', 'mem_inactive', 'swap_total', 'swap_free' ]:
             rrd.add_gauge(i)
-	rrd.create()
+        rrd.create()
 
     def update(self, path):
-	self._parse()
+        self._parse()
         self._rrd_update(path + '/memory.rrd')
 
 
@@ -220,10 +220,10 @@ class VolMonitor(Monitor):
             vol = "vol%d_" % (i)
             rrd.add_gauge(vol + 'total')
             rrd.add_gauge(vol + 'used')
-	rrd.create()
+        rrd.create()
 
     def update(self, path):
-	self._parse()
+        self._parse()
         self._rrd_update(path + '/volumes.rrd')
 
 
@@ -273,10 +273,10 @@ class HDMonitor(Monitor):
             rrd.add_gauge(hd + 'temp')
             rrd.add_gauge(hd + 'hours')
             rrd.add_gauge(hd + 'starts')
-	rrd.create()
+        rrd.create()
 
     def update(self, path):
-	self._parse()
+        self._parse()
         self._rrd_update(path + '/hds.rrd')
 
 
@@ -328,10 +328,10 @@ class IOMonitor(Monitor):
             rrd.add_counter(hd + 'readtime')
             rrd.add_counter(hd + 'writes')
             rrd.add_counter(hd + 'writetime')
-	rrd.create()
+        rrd.create()
 
     def update(self, path):
-	self._parse()
+        self._parse()
         self._rrd_update(path + '/hdio.rrd')
 
 
@@ -371,7 +371,7 @@ class NetMonitor(Monitor):
             lan = "eth%d_" % (i)
             rrd.add_counter(lan + "rx")
             rrd.add_counter(lan + "tx")
-	rrd.create()
+        rrd.create()
 
     def update(self, path):
         self._parse()
