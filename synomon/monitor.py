@@ -20,6 +20,31 @@ class Monitor:
     def get_data(self):
         raise NotImplementedError
 
+class UptimeMonitor(Monitor):
+    def __init__(self):
+        self._data = ()
+        try:
+            with open("/proc/uptime") as f:
+                self._cmd = f.read()
+        except:
+            self._cmd = None
+
+    def parse(self):
+        if self._cmd == None:
+            self._data = 0, 0
+        else:
+            m = self._search("^([\d]+)\.\d+ ([\d]+)\.", self._cmd)
+            self._data = tuple(map(int, m.group(1, 2)))
+
+    def show(self):
+        print "Uptime:"
+        print "    Uptime seconds :", self._data[0]
+        print "    Idle seconds   :", self._data[1]
+        print
+
+    def get_data(self):
+        return self._data
+
 class LoadMonitor(Monitor):
     def __init__(self):
         self._data = ()
@@ -46,7 +71,7 @@ class LoadMonitor(Monitor):
     def get_data(self):
         return self._data
 
-class IntMonitor(Monitor):
+class StatMonitor(Monitor):
     def __init__(self):
         self._data = ()
         try:
@@ -111,9 +136,9 @@ class VolMonitor(Monitor):
         self._cmd = self._run_command("df -m")
         self._data = { }
 
-    def parse(self, dev):
-        m = self._search("^" + dev + "\s+(\d+)\s+(\d+)", self._cmd)
-        self._data[dev] = map(int, m.group(1, 2))
+    def parse(self, path):
+        m = self._search('^' + path + '\s+(\d+)\s+(\d+)', self._cmd)
+        self._data[path] = map(int, m.group(1, 2))
 
     def show(self):
         print "Volume data:"
@@ -125,8 +150,8 @@ class VolMonitor(Monitor):
                                                  / self._data[i][0])
             print
 
-    def get_data(self, dev):
-        return tuple(self._data[dev])
+    def get_data(self, path):
+        return tuple(self._data[path])
 
 class HDMonitor(Monitor):
     def __init__(self, hdlist):

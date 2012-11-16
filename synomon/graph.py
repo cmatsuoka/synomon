@@ -74,12 +74,13 @@ class Report:
                                     area2, area3, def5, def6, cdef2, line5 ]
 
     def volume(self, vols):
-        def1 = [ self._def(vname='st', dsName='sys_total') ]
-        def2 = [ self._def(vname='su', dsName='sys_used') ]
-        cdef = [ CDEF(vname='sp', rpn='su,100,*,st,/') ]
-	line = [ LINE(defObj=cdef[0], color=color1[0], legend='Sys') ]
+        def1 = [ ]
+        def2 = [ ]
+        cdef = [ ]
+        line = [ ]
+	i = 0
 
-        for i in vols:
+        for v in vols:
             name_total = "vol%d_total" % (i)
             name_used  = "vol%d_used" % (i)
 
@@ -88,10 +89,11 @@ class Report:
             cdef.append(CDEF(vname="v%dp" % (i),
                              rpn="v%du,100,*,v%dt,/" % (i, i)))
 	    line.append(LINE(defObj=cdef[i], color=color1[i], width=2,
-                             legend="Vol%d" % (i)))
+                             legend=v[1]))
 
-        for i in [ 0 ] + vols:
 	    self._data = self._data + [ def1[i], def2[i], cdef[i], line[i] ]
+
+            i = i + 1
 
     def day_graph(self, path, label, size=(0,0)):
 	g = RRDGraph(path, start=-3600*24, end=-1, vertical_label=label)

@@ -15,6 +15,10 @@ class Rrd:
         self._ds.append(DataSource(dsName=name, dsType='COUNTER', heartbeat=600))
         
     def create(self, max_vols, max_hds, max_lan):
+        # Uptime data
+        for i in [ 'uptime_secs', 'idle_secs' ]:
+            self._add_counter(i)
+
         # Stat data
         for i in [ 'stat_user', 'stat_nice', 'stat_system', 'stat_idle',
                    'stat_iowait', 'stat_irq', 'stat_softirq' ]:
@@ -30,11 +34,8 @@ class Rrd:
             self._add_gauge(i)
 
         # Volume data
-        self._add_gauge('sys_total')
-        self._add_gauge('sys_used')
-
         for i in range(max_vols):
-            vol = "vol%d_" % (i + 1)
+            vol = "vol%d_" % (i)
             self._add_gauge(vol + "total")
             self._add_gauge(vol + "used")
 
