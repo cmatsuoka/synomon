@@ -36,6 +36,14 @@ CONF_MAX_VOLS = 10
 CONF_MAX_LAN  = 1
 
 
+def all_monitors():
+    return [ UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
+             VolMonitor(CONF_VOLUMES, CONF_MAX_VOLS),
+             HDMonitor(CONF_HDS, CONF_MAX_HDS),
+             IOMonitor(CONF_HDS, CONF_MAX_HDS),
+             NetMonitor(CONF_IFACES, CONF_MAX_LAN) ]
+
+
 if __name__ == '__main__':
 
     if len(sys.argv) < 2:
@@ -43,19 +51,11 @@ if __name__ == '__main__':
         sys.exit(0)
 
     if sys.argv[1] == 'show':
-        for i in [ UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
-                   VolMonitor(CONF_VOLUMES, CONF_MAX_VOLS),
-                   HDMonitor(CONF_HDS, CONF_MAX_HDS),
-                   IOMonitor(CONF_HDS, CONF_MAX_HDS),
-                   NetMonitor(CONF_IFACES, CONF_MAX_LAN) ]:
+        for i in all_monitors():
             i.show()
 
     elif sys.argv[1] == 'update':
-        for i in [ UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
-                   VolMonitor(CONF_VOLUMES, CONF_MAX_VOLS),
-                   HDMonitor(CONF_HDS, CONF_MAX_HDS),
-                   IOMonitor(CONF_HDS, CONF_MAX_HDS),
-                   NetMonitor(CONF_IFACES, CONF_MAX_LAN) ]:
+        for i in all_monitors():
             i.update(CONF_RRD_DIR)
 
     elif sys.argv[1] == 'report':
