@@ -21,8 +21,8 @@ volumes  = [
     ('/dev/vg2/volume_6', 'Vol6')
 ]
 
-hds      = [ "sda", "sdb" ]
-lan      = [ "eth0" ]
+hds      = [ 'sda', 'sdb' ]
+lan      = [ 'eth0' ]
 
 max_hds  = 2
 max_vols = 10
@@ -37,17 +37,17 @@ def parse(up, cnt, cpu, mem, hd, vol, io, net):
     cnt.parse()
     cpu.parse()
 
-    for i in [ "MemTotal", "MemFree", "Buffers", "Cached", "Active",
-               "Inactive", "SwapTotal", "SwapFree" ]:
+    for i in [ 'MemTotal', 'MemFree', 'Buffers', 'Cached', 'Active',
+               'Inactive', 'SwapTotal', 'SwapFree' ]:
         mem.parse(i)
 
     for i in volumes:
         vol.parse(i[0])
     
     for i in hds:
-        hd.parse(i, "Temperature_Celsius")
-        hd.parse(i, "Power_On_Hours")
-        hd.parse(i, "Start_Stop_Count")
+        hd.parse(i, 'Temperature_Celsius')
+        hd.parse(i, 'Power_On_Hours')
+        hd.parse(i, 'Start_Stop_Count')
         io.parse(i)
 
     for i in lan:
@@ -107,13 +107,13 @@ def get_data(up, cnt, cpu, mem, hd, vol, io, net):
     return t
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     if len(sys.argv) < 2:
         print "Usage: %s [ show | update | report ]" % (sys.argv[0])
         sys.exit(0)
 
-    if sys.argv[1] == "show":
+    if sys.argv[1] == 'show':
         up  = UptimeMonitor()
         cnt = StatMonitor()
         cpu = LoadMonitor()
@@ -125,7 +125,7 @@ if __name__ == "__main__":
         parse(up, cnt, cpu, mem, hd, vol, io, net)
         show(up, cnt, cpu, mem, hd, vol, io, net)
 
-    elif sys.argv[1] == "update":
+    elif sys.argv[1] == 'update':
         rrd = Rrd(conf_rrd_file)
 
 	if not os.path.exists(conf_rrd_file):
@@ -144,8 +144,8 @@ if __name__ == "__main__":
 	data = get_data(up, cnt, cpu, mem, hd, vol, io, net)
         rrd.update(data)
 
-    elif sys.argv[1] == "report":
-        print "Generating report..."
+    elif sys.argv[1] == 'report':
+        print 'Generating report...'
         graph = Graph(conf_rrd_file, height=150)
         graph.network(conf_dest_dir + '/g0.png')
         graph.cpu(conf_dest_dir + '/g1.png')
