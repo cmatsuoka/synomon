@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from pyrrd.graph import DEF, CDEF, VDEF, LINE, AREA, GPRINT
 from pyrrd.graph import Graph as RRDGraph
 
@@ -47,15 +49,16 @@ class Report:
                                     area1, area2, area5 ]
 
     def hdtemp(self, hds):
-        for i in hds:
-            j = ord(i[2]) - ord('a')
-            name = "%s_temp" % (i)
-            legend =  "HD%d temperature" % (j + 1)
+        i = 0
+        for hd in hds:
+            name = "hd%d_temp" % (i)
+            legend =  "HD%d temperature" % (i + 1)
             def1 = self._def(vname=name, dsName=name)
-            line1 = LINE(defObj=def1, color=color1[j] + '40') 
+            line1 = LINE(defObj=def1, color=color1[i] + '40') 
             cdef1 = CDEF(vname=name + '_t', rpn="%s,3000,TREND" % (name))
-            line2 = LINE(defObj=cdef1, color=color1[j], width=2, legend=legend)
+            line2 = LINE(defObj=cdef1, color=color1[i], width=2, legend=legend)
             self._data = self._data + [ def1, line1, cdef1, line2 ]
+            i = i + 1
 
     def memory(self, c1, c2, c3, c4):
         def1 = self._def(vname='tot', dsName='mem_total')
@@ -106,8 +109,8 @@ class Report:
         g.write()
 
 class Graph:
-    def __init__(self, rrd_file, width=0, height=0):
-        self._rrd_file = rrd_file
+    def __init__(self, path, width=0, height=0):
+        self._path = path
         self._width = width
         self._height = height
     
@@ -122,7 +125,7 @@ class Graph:
     def network(self, filename, width=0, height=0):
 	''' Network I/O graph '''
 	self._set_size(width, height)
-	r = Report(self._rrd_file)
+	r = Report(self._path + '/network.rrd')
         r.area('eth0_rx', '#00c000', 'Network rx')
         r.line('eth0_tx', '#0000c0', 'Network tx')
 	r.day_graph(filename, 'Bytes', self._size)
@@ -130,14 +133,14 @@ class Graph:
     def cpu(self, filename, width=0, height=0):
 	''' CPU stats graph '''
 	self._set_size(width, height)
-	r = Report(self._rrd_file)
+	r = Report(self._path + '/stat.rrd')
         r.cpu('#00c000', '#c0c000', '#0000c0', '#c00000')
 	r.day_graph(filename, 'Percentage', self._size)
 
     def load(self, filename, width=0, height=0):
 	''' CPU load graph '''
 	self._set_size(width, height)
-	r = Report(self._rrd_file)
+	r = Report(self._path + '/load.rrd')
         r.area('load_15', '#00c000', '15 min')
         r.line('load_1', '#0000c0', '1 min')
 	r.day_graph(filename, 'Active\ tasks', self._size)
@@ -145,41 +148,43 @@ class Graph:
     def memory(self, filename, width=0, height=0):
 	''' Memory usage graph '''
 	self._set_size(width, height)
-	r = Report(self._rrd_file)
+	r = Report(self._path + '/memory.rrd')
 	r.memory('#00c000', '#0000c0', '#00c0c0c0', '#c00000')
 	r.day_graph(filename, 'KBytes', self._size)
 
     def hdtemp(self, hds, filename, width=0, height=0):
         ''' HD temperature graph '''
 	self._set_size(width, height)
-	r = Report(self._rrd_file)
+	r = Report(self._path + '/hds.rrd')
 	r.hdtemp(hds)
 	r.day_graph(filename, 'Celsius', self._size)
 
     def hdio(self, hds, filename, width=0, height=0):
         ''' HD I/O graph '''
 	self._set_size(width, height)
-	r = Report(self._rrd_file)
-        for i in hds:
-            j = ord(i[2]) - ord('a')
-            r.line("%s_reads"  % (i), color1[j], "HD%d reads"  % (j + 1))
-            r.line("%s_writes" % (i), color2[j], "HD%d writes" % (j + 1))
+	r = Report(self._path + '/hdio.rrd')
+        i = 0
+        for hd in hds:
+            r.line("hd%d_reads"  % (i), color1[i], "HD%d reads"  % (i + 1))
+            r.line("hd%d_writes" % (i), color2[i], "HD%d writes" % (i + 1))
+            i = i + 1
 	r.day_graph(filename, 'Sectors', self._size)
 
     def hdtime(self, hds, filename, width=0, height=0):
         ''' HD I/O graph '''
 	self._set_size(width, height)
-	r = Report(self._rrd_file)
-        for i in hds:
-            j = ord(i[2]) - ord('a')
-            r.line("%s_readtime"  % (i), color1[j], "HD%d read"  % (j + 1))
-            r.line("%s_writetime" % (i), color2[j], "HD%d write" % (j + 1))
+	r = Report(self._path + '/hdio.rrd')
+        i = 0
+        for hd in hds:
+            r.line("hd%d_readtime"  % (i), color1[i], "HD%d read"  % (i + 1))
+            r.line("hd%d_writetime" % (i), color2[i], "HD%d write" % (i + 1))
+            i = i + 1
 	r.day_graph(filename, 'Milliseconds', self._size)
 
     def volume(self, vols, filename, width=0, height=0):
         ''' Volume usage graph '''
 	self._set_size(width, height)
-	r = Report(self._rrd_file)
+	r = Report(self._path + '/volumes.rrd')
         r.volume(vols)
 	r.day_graph(filename, 'Percent', self._size)
 
