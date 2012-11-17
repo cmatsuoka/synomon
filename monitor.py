@@ -60,15 +60,22 @@ if __name__ == '__main__':
 
     elif sys.argv[1] == 'report':
         print 'Generating report...'
-        GRAPH = Graph(CONF_RRD_DIR, height=150)
-        GRAPH.network(CONF_DEST_DIR + '/g0.png')
-        GRAPH.cpu(CONF_DEST_DIR + '/g1.png')
-        GRAPH.load(CONF_DEST_DIR + '/g2.png')
-        GRAPH.memory(CONF_DEST_DIR + '/g3.png')
-        GRAPH.hdtemp(CONF_HDS, CONF_DEST_DIR + '/g4.png')
-        GRAPH.hdio(CONF_HDS, CONF_DEST_DIR + '/g5.png')
-        GRAPH.hdtime(CONF_HDS, CONF_DEST_DIR + '/g6.png')
-        GRAPH.volume(CONF_VOLUMES, CONF_DEST_DIR + '/g7.png')
+
+        if len(sys.argv) > 2:
+            view = sys.argv[2]
+        else:
+            view = ''
+
+        GRAPH = Graph(CONF_RRD_DIR, CONF_DEST_DIR, height=150, width=560,
+                      view=view)
+        GRAPH.network('g0')
+        GRAPH.cpu('g1')
+        GRAPH.load('g2')
+        GRAPH.memory('g3')
+        GRAPH.hdtemp(CONF_HDS, 'g4')
+        GRAPH.hdio(CONF_HDS, 'g5')
+        GRAPH.hdtime(CONF_HDS, 'g6')
+        GRAPH.volume(CONF_VOLUMES, 'g7')
         
     else:
         print "Invalid command %s" % (sys.argv[1])

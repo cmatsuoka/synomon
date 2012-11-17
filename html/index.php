@@ -7,7 +7,7 @@
     background: #c0c0c0;
     text-align: center;
   } 
-  @media (min-width: 1024px) {
+  @media (min-width: 1300px) {
     .twocolumn {
       -moz-column-count: 2;
       -webkit-column-count: 2;
@@ -15,15 +15,17 @@
       column-fill: balance;
     }
   } 
+  h1 {
+    font-size: 150%;
+  }
   h2 {
-    text-align: center;
+    font-size: 110%;
   }
   h3 {
     font-size: 100%;
     margin-top: 0em;
     margin-bottom: 0.5em;
     padding-top: 1em;
-    text-align: center;
     break-before: column; 
     break-inside: avoid-column; 
     break-after: avoid-column;
@@ -33,12 +35,30 @@
 <body>
 
 <?php
-  shell_exec('PATH=/opt/bin:$PATH /root/monitor/monitor.py report');
-
   $host = gethostname();
   $date = getdate();
   $client = $_SERVER['REMOTE_ADDR'];
-  echo "<h2>$host</h2>";
+  $range = $_GET['r'];
+  echo "<h1>$host</h1>";
+  echo "<h2>";
+  switch ($range) {
+  case 'y':
+    echo "Yearly graphs (1 day average)";
+    break;
+  case 'm': 
+    echo "Monthly graphs (2 hour average)";
+    break;
+  case 'w':
+    echo "Weekly graphs (30 minute average)";
+    break;
+  default:
+    echo "Daily graphs (5 minute average)";
+    $range = '';
+  }
+  echo "</h2>";
+
+  shell_exec('PATH=/opt/bin:$PATH /root/monitor/monitor.py report ' + $range);
+
 ?>
 
 <p>

@@ -111,9 +111,22 @@ class _GraphBuilder:
 
             i = i + 1
 
-    def day_graph(self, path, label, size=(0, 0)):
-        ''' Create a day (86400s) graph '''
-        rrd_graph = RRDGraph(path, start=-3600*24, end=-1, vertical_label=label)
+    def do_graph(self, path, label, view='', size=(0,0)):
+        ''' Create the graph image file '''
+        if path == '':
+            raise Exception("Invalid filename")
+
+        if view == 'y':
+            start = 3600 * 24 * 365
+        elif view == 'm':
+            start = 3600 * 24 * 30
+        elif view == 'w':
+            start = 3600 * 24 * 7
+        else:
+            start = 3600 * 24
+
+        print "Write image", path
+        rrd_graph = RRDGraph(path, start=-start, end=-1, vertical_label=label)
         rrd_graph.data.extend(self._data)
         if size[0] > 0:
             rrd_graph.width = size[0]
@@ -124,11 +137,14 @@ class _GraphBuilder:
 
 class Graph:
     ''' Create graphs for data stored in RRDs '''
-    def __init__(self, path, width=0, height=0):
+    def __init__(self, path, dest, width=0, height=0, view=''):
         self._path = path
+        self._dest = dest
         self._width = width
         self._height = height
+        self._view = view
         self._size = ()
+        self._filename = ''
     
     def _set_size(self, width, height):
         ''' Set graph size '''
@@ -139,67 +155,81 @@ class Graph:
             size[1] = height
         self._size = tuple(size) 
 
-    def network(self, filename, width=0, height=0):
+    def _set_filename(self, name, view):
+        ''' Set image file name '''
+        if view == '':
+            view = self._view
+        self._filename = self._dest + '/' + name + view + '.png'
+
+    def network(self, filename, width=0, height=0, view=''):
         ''' Network I/O graph '''
         self._set_size(width, height)
+        self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/network.rrd')
         graph.area('eth0_rx', '#00c000', 'Network rx')
         graph.line('eth0_tx', '#0000c0', 'Network tx')
-        graph.day_graph(filename, 'Bytes', self._size)
+        graph.do_graph(self._filename, 'Bytes', self._view, self._size)
 
-    def cpu(self, filename, width=0, height=0):
+    def cpu(self, filename, width=0, height=0, view=''):
         ''' CPU stats graph '''
         self._set_size(width, height)
+        self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/stat.rrd')
         graph.cpu('#00c000', '#c0c000', '#0000c0', '#c00000')
-        graph.day_graph(filename, 'Percentage', self._size)
+        graph.do_graph(self._filename, 'Percentage', self._view, self._size)
 
-    def load(self, filename, width=0, height=0):
+    def load(self, filename, width=0, height=0, view=''):
         ''' CPU load graph '''
         self._set_size(width, height)
+        self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/load.rrd')
         graph.area('load_15', '#00c000', '15 min')
         graph.line('load_1', '#0000c0', '1 min')
-        graph.day_graph(filename, r'Active\ tasks', self._size)
+        graph.do_graph(self._filename, r'Active\ tasks', self._view, self._size)
 
-    def memory(self, filename, width=0, height=0):
+    def memory(self, filename, width=0, height=0, view=''):
         ''' Memory usage graph '''
         self._set_size(width, height)
+        self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/memory.rrd')
         graph.memory('#00c000', '#0000c0', '#00c0c0c0', '#c00000')
-        graph.day_graph(filename, 'KBytes', self._size)
+        graph.do_graph(self._filename, 'KBytes', self._view, self._size)
 
-    def hdtemp(self, hds, filename, width=0, height=0):
+    def hdtemp(self, hds, filename, width=0, height=0, view=''):
         ''' HD temperature graph '''
         self._set_size(width, height)
+        self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/hds.rrd')
         graph.hdtemp(hds)
-        graph.day_graph(filename, 'Celsius', self._size)
+        graph.do_graph(self._filename, 'Celsius', self._view, self._size)
 
-    def hdio(self, hds, filename, width=0, height=0):
+    def hdio(self, hds, filename, width=0, height=0, view=''):
         ''' HD I/O graph '''
         self._set_size(width, height)
+        self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/hdio.rrd')
         for i in range(len(hds)):
             graph.line('hd%d_reads'  % (i), COLOR1[i], 'HD%d reads'  % (i + 1))
             graph.line('hd%d_writes' % (i), COLOR2[i], 'HD%d writes' % (i + 1))
-        graph.day_graph(filename, 'Sectors', self._size)
+        graph.do_graph(self._filename, 'Sectors', self._view, self._size)
 
-    def hdtime(self, hds, filename, width=0, height=0):
+    def hdtime(self, hds, filename, width=0, height=0, view=''):
         ''' HD I/O graph '''
         self._set_size(width, height)
+        self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/hdio.rrd')
         for i in range(len(hds)):
             graph.line('hd%d_readtime'  % (i), COLOR1[i],
                        'HD%d read'  % (i + 1))
             graph.line('hd%d_writetime' % (i), COLOR2[i],
                        'HD%d write' % (i + 1))
-        graph.day_graph(filename, 'Milliseconds', self._size)
+        graph.do_graph(self._filename, 'Milliseconds', self._view, self._size)
 
-    def volume(self, vols, filename, width=0, height=0):
+    def volume(self, vols, filename, width=0, height=0, view=''):
         ''' Volume usage graph '''
         self._set_size(width, height)
+        self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/volumes.rrd')
         graph.volume(vols)
-        graph.day_graph(filename, 'Percent', self._size)
+        graph.do_graph(self._filename, 'Percent', self._view, self._size)
 

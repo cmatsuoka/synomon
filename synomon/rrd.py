@@ -42,9 +42,9 @@ class Rrd:
         self._rra.append(RRA(cf='MIN',     xff=0.5, steps=24, rows=360))
 
         # 24 hour average for yearly view
-        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=288, rows=360))
-        self._rra.append(RRA(cf='MAX',     xff=0.5, steps=288, rows=360))
-        self._rra.append(RRA(cf='MIN',     xff=0.5, steps=288, rows=360))
+        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=288, rows=365))
+        self._rra.append(RRA(cf='MAX',     xff=0.5, steps=288, rows=365))
+        self._rra.append(RRA(cf='MIN',     xff=0.5, steps=288, rows=365))
 
         print "Create %s" % (self._rrd_file)
         my_rrd = RRD(self._rrd_file, ds=self._ds, rra=self._rra)
