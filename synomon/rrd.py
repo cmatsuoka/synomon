@@ -28,14 +28,23 @@ class Rrd:
         
     def create(self):
         ''' Create the RRD '''
-        # 5 minute average for daily view (5 day log)
-        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=1, rows=1440))
+        # 5 minute average for daily view
+        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=1, rows=288))
 
-        # 30 minute average for monthly view (30 day log)
-        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=6, rows=1440))
+        # 30 minute average for weekly view
+        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=6, rows=336))
+        self._rra.append(RRA(cf='MAX',     xff=0.5, steps=6, rows=336))
+        self._rra.append(RRA(cf='MIN',     xff=0.5, steps=6, rows=336))
 
-        # 6 hour average for yearly view (360 day log)
-        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=72, rows=1440))
+        # 2 hour average for monthly view
+        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=24, rows=360))
+        self._rra.append(RRA(cf='MAX',     xff=0.5, steps=24, rows=360))
+        self._rra.append(RRA(cf='MIN',     xff=0.5, steps=24, rows=360))
+
+        # 24 hour average for yearly view
+        self._rra.append(RRA(cf='AVERAGE', xff=0.5, steps=288, rows=360))
+        self._rra.append(RRA(cf='MAX',     xff=0.5, steps=288, rows=360))
+        self._rra.append(RRA(cf='MIN',     xff=0.5, steps=288, rows=360))
 
         print "Create %s" % (self._rrd_file)
         my_rrd = RRD(self._rrd_file, ds=self._ds, rra=self._rra)
