@@ -35,6 +35,11 @@
 <body>
 
 <?php
+  function image($title, $name, $range) {
+    echo '<h3>' . $title . '</h3>';
+    echo '<img src="' . $name . $range . '.png">';
+  }
+
   $host = gethostname();
   $date = getdate();
   $client = $_SERVER['REMOTE_ADDR'];
@@ -57,37 +62,21 @@
   }
   echo "</h2>";
 
-  shell_exec('PATH=/opt/bin:$PATH /root/monitor/monitor.py report ' + $range);
-
+  shell_exec('PATH=/opt/bin:$PATH /root/monitor/monitor.py report ' . $range);
 ?>
 
 <p>
 <div class="twocolumn">
-
-<h3>Network</h3>
-<img src="g0.png">
-
-<h3>CPU stat</h3>
-<img src="g1.png">
-
-<h3>CPU load</h3>
-<img src="g2.png">
-
-<h3>Memory usage</h3>
-<img src="g3.png">
-
-<h3>Disk temperature</h3>
-<img src="g4.png">
-
-<h3>Disk I/O</h3>
-<img src="g5.png">
-
-<h3>Disk I/O time</h3>
-<img src="g6.png">
-
-<h3>Volume usage</h3>
-<img src="g7.png">
-
+<?php
+  image('Network', 'g0', $range);
+  image('CPU stat', 'g1', $range);
+  image('CPU load', 'g2', $range);
+  image('Memory usage', 'g3', $range);
+  image('Disk temperature', 'g4', $range);
+  image('Disk I/O', 'g5', $range);
+  image('Disk I/O time', 'g6', $range);
+  image('Volume usage', 'g7', $range);
+?>
 </div>
 
 <p>
