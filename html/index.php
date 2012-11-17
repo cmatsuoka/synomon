@@ -7,7 +7,7 @@
     background: #c0c0c0;
     text-align: center;
   } 
-  @media (min-width: 1300px) {
+  @media (min-width: 1165px) {
     .twocolumn {
       -moz-column-count: 2;
       -webkit-column-count: 2;

@@ -66,7 +66,7 @@ if __name__ == '__main__':
         else:
             view = ''
 
-        GRAPH = Graph(CONF_RRD_DIR, CONF_DEST_DIR, height=150, width=560,
+        GRAPH = Graph(CONF_RRD_DIR, CONF_DEST_DIR, height=150, width=480,
                       view=view)
         GRAPH.network('g0')
         GRAPH.cpu('g1')
