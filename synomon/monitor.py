@@ -4,7 +4,7 @@ import subprocess
 import re
 import os
 
-from rrd import *
+from synomon.rrd import Rrd
 
 class Monitor:
     def _run_command(self, cmd):
@@ -18,8 +18,11 @@ class Monitor:
 
     def _rrd_update(self, filename):
         if not os.path.exists(filename):
-            self._create(filename)
+            self.create(filename)
         Rrd(filename).update(self._data)
+
+    def create(self):
+        raise NotImplementedError
 
     def show(self):
         raise NotImplementedError
@@ -52,9 +55,9 @@ class UptimeMonitor(Monitor):
         print "    Idle seconds   :", self._data[1]
         print
 
-    def _create(self, filename):
+    def create(self, filename):
         rrd = Rrd(filename)
-        rrd.add_counter('uptime_secs')
+        rrd.add_counter('uptime')
         rrd.add_counter('idle')
         rrd.create()
 
@@ -87,7 +90,7 @@ class LoadMonitor(Monitor):
         print "    15m average :", self._data[2]
         print
 
-    def _create(self, filename):
+    def create(self, filename):
         rrd = Rrd(filename)
         for i in [ 'load_1', 'load_5', 'load_15' ]:
             rrd.add_gauge(i)
@@ -117,7 +120,7 @@ class StatMonitor(Monitor):
 
     def show(self):
         self._parse()
-        print 'CPU counters:'
+        print 'CPU stats:'
         print '    User    :', self._data[0]
         print '    Nice    :', self._data[1]
         print '    System  :', self._data[2]
@@ -127,7 +130,7 @@ class StatMonitor(Monitor):
         print '    Softirq :', self._data[6]
         print
 
-    def _create(self, filename):
+    def create(self, filename):
         rrd = Rrd(filename)
         for i in [ 'stat_user', 'stat_nice', 'stat_system', 'stat_idle',
                    'stat_iowait', 'stat_irq', 'stat_softirq' ]:
@@ -173,7 +176,7 @@ class MemMonitor(Monitor):
         print '    SwapFree  :', self._data[7]
         print
 
-    def _create(self, filename):
+    def create(self, filename):
         rrd = Rrd(filename)
         for i in [ 'mem_total', 'mem_free', 'mem_buffers', 'mem_cached',
                    'mem_active', 'mem_inactive', 'swap_total', 'swap_free' ]:
@@ -214,7 +217,7 @@ class VolMonitor(Monitor):
             print
             i = i + 2
 
-    def _create(self, filename):
+    def create(self, filename):
         rrd = Rrd(filename)
         for i in range(self._max_vols):
             vol = "vol%d_" % (i)
@@ -266,7 +269,7 @@ class HDMonitor(Monitor):
             print
             i = i + 3
 
-    def _create(self, filename):
+    def create(self, filename):
         rrd = Rrd(filename)
         for i in range(self._max_hds):
             hd = "hd%d_" % i
@@ -320,7 +323,7 @@ class IOMonitor(Monitor):
             print
             i = i + 4
 
-    def _create(self, filename):
+    def create(self, filename):
         rrd = Rrd(filename)
         for i in range(self._max_hds):
             hd = "hd%d_" % i
@@ -365,7 +368,7 @@ class NetMonitor(Monitor):
             print
             i = i + 2
 
-    def _create(self, filename):
+    def create(self, filename):
         rrd = Rrd(filename)
         for i in range(self._max_lan):
             lan = "eth%d_" % (i)

@@ -2,11 +2,6 @@
 <head>
   <title>Stats</title>
   <style type="text/css">
-  body {
-    font-family: Verdana,Arial,sans-serif;
-    background: #c0c0c0;
-    text-align: center;
-  } 
   @media (min-width: 1165px) {
     .twocolumn {
       -moz-column-count: 2;
@@ -14,6 +9,11 @@
       column-count: 2;
       column-fill: balance;
     }
+  } 
+  body {
+    font-family: Verdana,Arial,sans-serif;
+    background: #c0c0c0;
+    text-align: center;
   } 
   h1 {
     font-size: 150%;
@@ -30,14 +30,21 @@
     break-inside: avoid-column; 
     break-after: avoid-column;
   }
+  .graph {
+    -moz-column-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    column-break-inside: avoid;
+  }
   </style>
 </head>
 <body>
 
 <?php
   function image($title, $name, $range) {
-    echo '<h3>' . $title . '</h3>';
-    echo '<img src="' . $name . $range . '.png">';
+    echo '<div class="graph">';
+    echo ' <h3>' . $title . '</h3>';
+    echo ' <img src="' . $name . $range . '.png">';
+    echo '</div>';
   }
 
   $host = gethostname();
@@ -68,13 +75,13 @@
 <p>
 <div class="twocolumn">
 <?php
-  image('Network', 'g0', $range);
+  image('Router', 'g8', $range);
+  image('NAS network', 'g0', $range);
   image('CPU stat', 'g1', $range);
   image('CPU load', 'g2', $range);
   image('Memory usage', 'g3', $range);
   image('Disk temperature', 'g4', $range);
   image('Disk I/O', 'g5', $range);
-  image('Disk I/O time', 'g6', $range);
   image('Volume usage', 'g7', $range);
 ?>
 </div>

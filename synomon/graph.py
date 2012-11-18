@@ -161,6 +161,15 @@ class Graph:
             view = self._view
         self._filename = self._dest + '/' + name + view + '.png'
 
+    def router(self, filename, width=0, height=0, view=''):
+        ''' Router traffic graph '''
+        self._set_size(width, height)
+        self._set_filename(filename, view)
+        graph = _GraphBuilder(self._path + '/router.rrd')
+        graph.area('rx', '#00c000', 'Network rx')
+        graph.line('tx', '#0000c0', 'Network tx')
+        graph.do_graph(self._filename, 'Bytes', self._view, self._size)
+
     def network(self, filename, width=0, height=0, view=''):
         ''' Network I/O graph '''
         self._set_size(width, height)

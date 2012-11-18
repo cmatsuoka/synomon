@@ -21,9 +21,15 @@ class Rrd:
         ''' Create a DS with type GAUGE '''
         self._ds.append(DataSource(dsName=name, dsType='GAUGE', heartbeat=600))
 
+    # From http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+    #
+    # If you cannot tolerate ever mistaking the occasional counter reset for a
+    # legitimate counter wrap, and would prefer "Unknowns" for all legitimate
+    # counter wraps and resets, always use DERIVE with min=0.
+
     def add_counter(self, name):
         ''' Create a DS with type COUNTER '''
-        self._ds.append(DataSource(dsName=name, dsType='COUNTER',
+        self._ds.append(DataSource(dsName=name, dsType='DERIVE', minval=0,
                                                 heartbeat=600))
         
     def create(self):

@@ -13,6 +13,7 @@ import sys
 
 from synomon.monitor import UptimeMonitor, StatMonitor, LoadMonitor, MemMonitor
 from synomon.monitor import VolMonitor, HDMonitor, IOMonitor, NetMonitor
+from synomon.tplink import RouterMonitor
 from synomon.graph import Graph
 
 CONF_RRD_DIR   = "/opt/var/lib/monitor"
@@ -35,9 +36,11 @@ CONF_MAX_HDS  = 2
 CONF_MAX_VOLS = 10
 CONF_MAX_LAN  = 1
 
+# FIXME: don't hardcode stuff
 
 def all_monitors():
-    return [ UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
+    return [ RouterMonitor('address', 'username:password'),
+             UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
              VolMonitor(CONF_VOLUMES, CONF_MAX_VOLS),
              HDMonitor(CONF_HDS, CONF_MAX_HDS),
              IOMonitor(CONF_HDS, CONF_MAX_HDS),
@@ -68,13 +71,14 @@ if __name__ == '__main__':
 
         GRAPH = Graph(CONF_RRD_DIR, CONF_DEST_DIR, height=150, width=480,
                       view=view)
+        GRAPH.router('g8')
         GRAPH.network('g0')
         GRAPH.cpu('g1')
         GRAPH.load('g2')
         GRAPH.memory('g3')
         GRAPH.hdtemp(CONF_HDS, 'g4')
         GRAPH.hdio(CONF_HDS, 'g5')
-        GRAPH.hdtime(CONF_HDS, 'g6')
+        #GRAPH.hdtime(CONF_HDS, 'g6')
         GRAPH.volume(CONF_VOLUMES, 'g7')
         
     else:
