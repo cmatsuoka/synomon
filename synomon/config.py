@@ -45,6 +45,7 @@ class Config:
         config.add_section('Global')
         config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
         config.set('Global', 'dest_dir', '/volume1/web/stats/')
+        config.set('Global', 'monitors', 'uptime,stat,load,memory,volume,hd,io,network')
 
         config.add_section('Network')
         config.set('Network', 'max_lan', '2')

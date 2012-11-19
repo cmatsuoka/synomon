@@ -10,10 +10,10 @@ since this device doesn't offer a management service.
  
 import re
 
-from .monitor import Monitor
+from .monitor import Monitor, MONITORS
 from .rrd import Rrd
 
-class RouterMonitor(Monitor):
+class _TplinkMonitor(Monitor):
     def __init__(self, config):
         user = '%s:%s' % (config.get('Tplink', 'user'),
                           config.get('Tplink', 'password'))
@@ -48,3 +48,4 @@ class RouterMonitor(Monitor):
         self._parse()
         self._rrd_update(path + '/router.rrd')
  
+MONITORS['tplink'] = _TplinkMonitor

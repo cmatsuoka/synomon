@@ -12,17 +12,11 @@ or hard disks reserve space for them in the CONF_MAX_* variables.
 import sys
 
 from synomon.config import Config
-from synomon.monitor import *
-from synomon.tplink import RouterMonitor
 from synomon.graph import Graph
 
+import synomon.monitor
+import synomon.tplink
 
-MONITORS = [ RouterMonitor, UptimeMonitor, StatMonitor, LoadMonitor,
-             MemMonitor, VolMonitor, HDMonitor, IOMonitor, NetMonitor ]
-
-
-def all_monitors(config):
-    return [ i(config) for i in MONITORS ]
 
 if __name__ == '__main__':
 
@@ -33,11 +27,11 @@ if __name__ == '__main__':
         sys.exit(0)
 
     if sys.argv[1] == 'show':
-        for i in all_monitors(config):
+        for i in synomon.monitor.monitors(config):
             i.show()
 
     elif sys.argv[1] == 'update':
-        for i in all_monitors(config):
+        for i in synomon.monitor.monitors(config):
             i.update(config.get('Global', 'rrd_dir'))
 
     elif sys.argv[1] == 'report':

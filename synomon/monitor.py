@@ -31,7 +31,7 @@ class Monitor:
         raise NotImplementedError
 
 
-class UptimeMonitor(Monitor):
+class _UptimeMonitor(Monitor):
     def __init__(self, config):
         self._data = ()
         try:
@@ -66,7 +66,7 @@ class UptimeMonitor(Monitor):
         self._rrd_update(path + '/uptime.rrd')
         
 
-class LoadMonitor(Monitor):
+class _LoadMonitor(Monitor):
     def __init__(self, config):
         self._data = ()
         try:
@@ -100,7 +100,7 @@ class LoadMonitor(Monitor):
         self._rrd_update(path + '/load.rrd')
         
 
-class StatMonitor(Monitor):
+class _StatMonitor(Monitor):
     def __init__(self, config):
         self._data = ()
         try:
@@ -141,7 +141,7 @@ class StatMonitor(Monitor):
         self._rrd_update(path + '/stat.rrd')
         
 
-class MemMonitor(Monitor):
+class _MemMonitor(Monitor):
     def __init__(self, config):
         self._data = ()
         try:
@@ -187,7 +187,7 @@ class MemMonitor(Monitor):
         self._rrd_update(path + '/memory.rrd')
 
 
-class VolMonitor(Monitor):
+class _VolMonitor(Monitor):
     def __init__(self, config):
 	items = config.items('Volumes')
         self._volumes = [ i for i in items if i[0] != 'max_vols' ]
@@ -230,7 +230,7 @@ class VolMonitor(Monitor):
         self._rrd_update(path + '/volumes.rrd')
 
 
-class HDMonitor(Monitor):
+class _HDMonitor(Monitor):
     def __init__(self, config):
         self._hds = config.getlist('Disk', 'hds')
         self._max_hds = config.getint('Disk', 'max_hds')
@@ -283,7 +283,7 @@ class HDMonitor(Monitor):
         self._rrd_update(path + '/hds.rrd')
 
 
-class IOMonitor(Monitor):
+class _IOMonitor(Monitor):
     def __init__(self, config):
         self._hds = config.getlist('Disk', 'hds')
         self._max_hds = config.getint('Disk', 'max_hds')
@@ -338,7 +338,7 @@ class IOMonitor(Monitor):
         self._rrd_update(path + '/hdio.rrd')
 
 
-class NetMonitor(Monitor):
+class _NetMonitor(Monitor):
     def __init__(self, config):
         self._ifaces = config.getlist('Network', 'ifaces')
         self._max_lan = config.getint('Network', 'max_lan')
@@ -379,3 +379,18 @@ class NetMonitor(Monitor):
     def update(self, path):
         self._parse()
         self._rrd_update(path + '/network.rrd')
+
+MONITORS = {
+    'uptime' : _UptimeMonitor,
+    'load'   : _LoadMonitor,
+    'stat'   : _StatMonitor,
+    'memory' : _MemMonitor,
+    'volume' : _VolMonitor,
+    'hd'     : _HDMonitor,
+    'io'     : _IOMonitor,
+    'network': _NetMonitor
+}
+
+def monitors(config):
+    return [ MONITORS[i](config) for i in config.getlist('Global', 'monitors') ]
+
