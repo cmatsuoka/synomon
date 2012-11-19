@@ -16,9 +16,6 @@ from synomon.monitor import *
 from synomon.tplink import RouterMonitor
 from synomon.graph import Graph
 
-CONF_RRD_DIR   = "/opt/var/lib/monitor"
-CONF_DEST_DIR  = "/volume1/web/stats"
-
 CONF_VOLUMES   = [
     ('/dev/md0', 'Sys'),
     ('/dev/vg1/volume_1', 'Vol1'),
@@ -61,7 +58,7 @@ if __name__ == '__main__':
 
     elif sys.argv[1] == 'update':
         for i in all_monitors(config):
-            i.update(CONF_RRD_DIR)
+            i.update(config.get('Global', 'rrd_dir'))
 
     elif sys.argv[1] == 'report':
         print 'Generating report...'
@@ -71,8 +68,7 @@ if __name__ == '__main__':
         else:
             view = ''
 
-        GRAPH = Graph(CONF_RRD_DIR, CONF_DEST_DIR, height=150, width=480,
-                      view=view)
+        GRAPH = Graph(config, height=150, width=480, view=view)
         GRAPH.router('g8')
         GRAPH.network('g0')
         GRAPH.cpu('g1')

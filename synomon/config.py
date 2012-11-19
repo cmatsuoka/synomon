@@ -34,7 +34,11 @@ class Config:
 
         config = ConfigParser.ConfigParser()
         config.add_section('Global')
+        config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
+        config.set('Global', 'dest_dir', '/volume1/web/stats/')
+
         config.add_section('Volume')
+
         config.add_section('Tplink')
         config.set('Tplink', 'host', '192.168.1.1')
         config.set('Tplink', 'user', 'admin')

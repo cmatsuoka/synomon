@@ -137,9 +137,9 @@ class _GraphBuilder:
 
 class Graph:
     ''' Create graphs for data stored in RRDs '''
-    def __init__(self, path, dest, width=0, height=0, view=''):
-        self._path = path
-        self._dest = dest
+    def __init__(self, config, width=0, height=0, view=''):
+        self._path = config.get('Global', 'rrd_dir')
+        self._dest = config.get('Global', 'dest_dir')
         self._width = width
         self._height = height
         self._view = view
