@@ -17,14 +17,12 @@ from synomon.tplink import RouterMonitor
 from synomon.graph import Graph
 
 
-def all_monitors(config):
-    return [ RouterMonitor(config),
-             UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
-             VolMonitor(config),
-             HDMonitor(config),
-             IOMonitor(config),
-             NetMonitor(config) ]
+MONITORS = [ RouterMonitor, UptimeMonitor, StatMonitor, LoadMonitor,
+             MemMonitor, VolMonitor, HDMonitor, IOMonitor, NetMonitor ]
 
+
+def all_monitors(config):
+    return [ i(config) for i in MONITORS ]
 
 if __name__ == '__main__':
 

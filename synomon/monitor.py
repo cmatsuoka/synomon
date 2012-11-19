@@ -4,7 +4,7 @@ import subprocess
 import re
 import os
 
-from synomon.rrd import Rrd
+from .rrd import Rrd
 
 class Monitor:
     def _run_command(self, cmd):
@@ -32,7 +32,7 @@ class Monitor:
 
 
 class UptimeMonitor(Monitor):
-    def __init__(self):
+    def __init__(self, config):
         self._data = ()
         try:
             with open("/proc/uptime") as f:
@@ -67,7 +67,7 @@ class UptimeMonitor(Monitor):
         
 
 class LoadMonitor(Monitor):
-    def __init__(self):
+    def __init__(self, config):
         self._data = ()
         try:
             with open("/proc/loadavg") as f:
@@ -101,7 +101,7 @@ class LoadMonitor(Monitor):
         
 
 class StatMonitor(Monitor):
-    def __init__(self):
+    def __init__(self, config):
         self._data = ()
         try:
             with open("/proc/stat") as f:
@@ -142,7 +142,7 @@ class StatMonitor(Monitor):
         
 
 class MemMonitor(Monitor):
-    def __init__(self):
+    def __init__(self, config):
         self._data = ()
         try:
             with open('/proc/meminfo') as f:

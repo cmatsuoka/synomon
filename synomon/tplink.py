@@ -10,8 +10,8 @@ since this device doesn't offer a management service.
  
 import re
 
-from synomon.monitor import Monitor
-from synomon.rrd import Rrd
+from .monitor import Monitor
+from .rrd import Rrd
 
 class RouterMonitor(Monitor):
     def __init__(self, config):
