@@ -46,6 +46,10 @@ class Config:
         config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
         config.set('Global', 'dest_dir', '/volume1/web/stats/')
 
+        config.add_section('Network')
+        config.set('Network', 'max_lan', '2')
+        config.set('Network', 'ifaces', 'eth0')
+
         config.add_section('Disk')
         config.set('Disk', 'max_hds', '2')
         config.set('Disk', 'hds', 'sda,sdb')

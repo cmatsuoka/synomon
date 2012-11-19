@@ -339,13 +339,13 @@ class IOMonitor(Monitor):
 
 
 class NetMonitor(Monitor):
-    def __init__(self, ifaces, max_lan):
-        self._ifaces = ifaces
-        self._max_lan = max_lan
+    def __init__(self, config):
+        self._ifaces = config.getlist('Network', 'ifaces')
+        self._max_lan = config.getint('Network', 'max_lan')
         self._cmd = { }
         self._data = ()
 
-        for i in ifaces:
+        for i in self._ifaces:
             self._cmd[i] = self._run_command("ifconfig " + i)
 
     def _parse(self):

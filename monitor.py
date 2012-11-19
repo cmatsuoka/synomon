@@ -16,11 +16,6 @@ from synomon.monitor import *
 from synomon.tplink import RouterMonitor
 from synomon.graph import Graph
 
-CONF_IFACES   = [ 'eth0' ]
-
-CONF_MAX_LAN  = 1
-
-# FIXME: don't hardcode stuff
 
 def all_monitors(config):
     return [ RouterMonitor(config),
@@ -28,7 +23,7 @@ def all_monitors(config):
              VolMonitor(config),
              HDMonitor(config),
              IOMonitor(config),
-             NetMonitor(CONF_IFACES, CONF_MAX_LAN) ]
+             NetMonitor(config) ]
 
 
 if __name__ == '__main__':
