@@ -51,9 +51,7 @@ if __name__ == '__main__':
         GRAPH.hdtemp(config.getlist('Disk', 'hds'), 'g4')
         GRAPH.hdio(config.getlist('Disk', 'hds'), 'g5')
         #GRAPH.hdtime(config.get_list('Disk', 'hds', 'g6')
-
-        # FIXME
-        GRAPH.volume([i for i in config.items('Volumes') if i[0] != 'max_vols' ], 'g7')
+        GRAPH.volume(config.items('VolumeList'), 'g7')
         
     else:
         print "Invalid command %s" % (sys.argv[1])

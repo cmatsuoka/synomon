@@ -195,8 +195,8 @@ class _MemMonitor(Monitor):
 class _VolMonitor(Monitor):
     def __init__(self, config):
         super(_VolMonitor, self).__init__(config)
-	self._volumes = config.items('Volumes')
-        self._max_vols = config.getint('Volume', 'max_vols')
+	self._volumes = config.items('VolumeList')
+        self._max_vols = config.getint('Volumes', 'max_vols')
         self._cmd = self._run_command('df -m')
 
     def _parse(self):
@@ -231,7 +231,7 @@ class _VolMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update('Volume')
+        self._rrd_update('Volumes')
 
 
 class _HDMonitor(Monitor):

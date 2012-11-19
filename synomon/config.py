@@ -69,14 +69,14 @@ class Config:
         config.add_section('DiskIO')
         config.set('DiskIO', 'rrd', 'hdio.rrd')
 
-        config.add_section('Volume')
-        config.set('Volume', 'rrd', 'volumes.rrd')
-        config.set('Volume', 'max_vols', '10')
-
         config.add_section('Volumes')
-        config.set('Volumes', 'Sys', '/dev/md0')
-        config.set('Volumes', 'Vol1', '/dev/vg1/volume_1')
-        config.set('Volumes', 'Vol2', '/dev/vg1/volume_2')
+        config.set('Volumes', 'rrd', 'volumes.rrd')
+        config.set('Volumes', 'max_vols', '10')
+
+        config.add_section('VolumeList')
+        config.set('VolumeList', 'Sys', '/dev/md0')
+        config.set('VolumeList', 'Vol1', '/dev/vg1/volume_1')
+        config.set('VolumeList', 'Vol2', '/dev/vg1/volume_2')
 
         config.add_section('Tplink')
         config.set('Tplink', 'host', '192.168.1.1')
