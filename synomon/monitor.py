@@ -188,9 +188,10 @@ class MemMonitor(Monitor):
 
 
 class VolMonitor(Monitor):
-    def __init__(self, volumes, max_vols):
-        self._volumes = volumes
-        self._max_vols = max_vols
+    def __init__(self, config):
+	items = config.items('Volumes')
+        self._volumes = [ i for i in items if i[0] != 'max_vols' ]
+        self._max_vols = config.getint('Volumes', 'max_vols')
         self._cmd = self._run_command('df -m')
         self._data = ()
 
@@ -198,7 +199,7 @@ class VolMonitor(Monitor):
         temp = [ 0 ] * (2 * self._max_vols)
         i = 0
         for v in self._volumes:
-            m = self._search('^' + v[0] + '\s+(\d+)\s+(\d+)', self._cmd)
+            m = self._search('^' + v[1] + '\s+(\d+)\s+(\d+)', self._cmd)
             temp[i], temp[i + 1] = tuple(map(int, m.group(1, 2)))
             i = i + 2
         self._data = temp
@@ -208,7 +209,7 @@ class VolMonitor(Monitor):
         print "Volume data:"
         i = 0
         for v in self._volumes:
-            print "    %s [%s]:" % v
+            print "    %s [%s]:" % (v[1], v[0])
             print "        Total   : %d" % (self._data[i])
             print "        Used    : %d" % (self._data[i + 1])
             print "        Percent : %4.1f%%" % (100.0 * self._data[i + 1]
@@ -231,8 +232,8 @@ class VolMonitor(Monitor):
 
 class HDMonitor(Monitor):
     def __init__(self, config):
-        self._hds = config.get_list('Disk', 'hds')
-        self._max_hds = config.get_int('Disk', 'max_hds')
+        self._hds = config.getlist('Disk', 'hds')
+        self._max_hds = config.getint('Disk', 'max_hds')
         self._cmd = { }
         self._data = ()
 
@@ -284,8 +285,8 @@ class HDMonitor(Monitor):
 
 class IOMonitor(Monitor):
     def __init__(self, config):
-        self._hds = config.get_list('Disk', 'hds')
-        self._max_hds = config.get_int('Disk', 'max_hds')
+        self._hds = config.getlist('Disk', 'hds')
+        self._max_hds = config.getint('Disk', 'max_hds')
         self._cmd = { }
         self._data = ()
 

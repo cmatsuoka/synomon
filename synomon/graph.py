@@ -105,7 +105,7 @@ class _GraphBuilder:
             cdef.append(CDEF(vname='v%dp' % (i),
                              rpn='v%du,100,*,v%dt,/' % (i, i)))
             line.append(LINE(defObj=cdef[i], color=COLOR1[i], width=2,
-                             legend=vol[1]))
+                             legend=vol[0]))
 
             self._data = self._data + [ def1[i], def2[i], cdef[i], line[i] ]
 

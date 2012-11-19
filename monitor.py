@@ -16,19 +16,8 @@ from synomon.monitor import *
 from synomon.tplink import RouterMonitor
 from synomon.graph import Graph
 
-CONF_VOLUMES   = [
-    ('/dev/md0', 'Sys'),
-    ('/dev/vg1/volume_1', 'Vol1'),
-    ('/dev/vg1/volume_2', 'Vol2'),
-    ('/dev/vg1/volume_3', 'Vol3'),
-    ('/dev/vg1/volume_4', 'Vol4'),
-    ('/dev/vg1/volume_5', 'Vol5'),
-    ('/dev/vg2/volume_6', 'Vol6')
-]
-
 CONF_IFACES   = [ 'eth0' ]
 
-CONF_MAX_VOLS = 10
 CONF_MAX_LAN  = 1
 
 # FIXME: don't hardcode stuff
@@ -36,7 +25,7 @@ CONF_MAX_LAN  = 1
 def all_monitors(config):
     return [ RouterMonitor(config),
              UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
-             VolMonitor(CONF_VOLUMES, CONF_MAX_VOLS),
+             VolMonitor(config),
              HDMonitor(config),
              IOMonitor(config),
              NetMonitor(CONF_IFACES, CONF_MAX_LAN) ]
@@ -72,10 +61,12 @@ if __name__ == '__main__':
         GRAPH.cpu('g1')
         GRAPH.load('g2')
         GRAPH.memory('g3')
-        GRAPH.hdtemp(config.get_list('Disk', 'hds'), 'g4')
-        GRAPH.hdio(config.get_list('Disk', 'hds'), 'g5')
+        GRAPH.hdtemp(config.getlist('Disk', 'hds'), 'g4')
+        GRAPH.hdio(config.getlist('Disk', 'hds'), 'g5')
         #GRAPH.hdtime(config.get_list('Disk', 'hds', 'g6')
-        GRAPH.volume(CONF_VOLUMES, 'g7')
+
+        # FIXME
+        GRAPH.volume([i for i in config.items('Volumes') if i[0] != 'max_vols' ], 'g7')
         
     else:
         print "Invalid command %s" % (sys.argv[1])
