@@ -14,10 +14,13 @@ from synomon.monitor import Monitor
 from synomon.rrd import Rrd
 
 class RouterMonitor(Monitor):
-    def __init__(self, addr, user):
+    def __init__(self, config):
+        user = '%s:%s' % (config.get('Tplink', 'user'),
+                          config.get('Tplink', 'password'))
+        host = config.get('Tplink', 'host')
         self._data = ()
         self._cmd = self._run_command('curl -s --user ' + user + ' http://' +
-                                      addr + '/userRpm/StatusRpm.htm')
+                                      host + '/userRpm/StatusRpm.htm')
 
     def _parse(self):
         if self._cmd == None:

@@ -11,8 +11,8 @@ or hard disks reserve space for them in the CONF_MAX_* variables.
 
 import sys
 
-from synomon.monitor import UptimeMonitor, StatMonitor, LoadMonitor, MemMonitor
-from synomon.monitor import VolMonitor, HDMonitor, IOMonitor, NetMonitor
+from synomon.config import Config
+from synomon.monitor import *
 from synomon.tplink import RouterMonitor
 from synomon.graph import Graph
 
@@ -38,8 +38,8 @@ CONF_MAX_LAN  = 1
 
 # FIXME: don't hardcode stuff
 
-def all_monitors():
-    return [ RouterMonitor('address', 'user:password'),
+def all_monitors(config):
+    return [ RouterMonitor(config),
              UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
              VolMonitor(CONF_VOLUMES, CONF_MAX_VOLS),
              HDMonitor(CONF_HDS, CONF_MAX_HDS),
@@ -49,16 +49,18 @@ def all_monitors():
 
 if __name__ == '__main__':
 
+    config = Config()
+
     if len(sys.argv) < 2:
         print "Usage: %s [ show | update | report ]" % (sys.argv[0])
         sys.exit(0)
 
     if sys.argv[1] == 'show':
-        for i in all_monitors():
+        for i in all_monitors(config):
             i.show()
 
     elif sys.argv[1] == 'update':
-        for i in all_monitors():
+        for i in all_monitors(config):
             i.update(CONF_RRD_DIR)
 
     elif sys.argv[1] == 'report':
