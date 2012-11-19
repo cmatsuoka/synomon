@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     elif sys.argv[1] == 'update':
         for i in synomon.monitor.monitors(config):
-            i.update(config.get('Global', 'rrd_dir'))
+            i.update()
 
     elif sys.argv[1] == 'report':
         print 'Generating report...'

@@ -100,7 +100,7 @@ class _LoadMonitor(Monitor):
         rrd.add_gauge('load_15')
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
         self._rrd_update('Load')
         
@@ -141,7 +141,7 @@ class _StatMonitor(Monitor):
             rrd.add_counter(i)
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
         self._rrd_update('Stat')
         
@@ -187,7 +187,7 @@ class _MemMonitor(Monitor):
             rrd.add_gauge(i)
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
         self._rrd_update('Memory')
 
@@ -229,7 +229,7 @@ class _VolMonitor(Monitor):
             rrd.add_gauge(vol + 'used')
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
         self._rrd_update('Volumes')
 
@@ -282,7 +282,7 @@ class _HDMonitor(Monitor):
             rrd.add_gauge(hd + 'starts')
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
         self._rrd_update('Disk')
 
@@ -337,7 +337,7 @@ class _IOMonitor(Monitor):
             rrd.add_counter(hd + 'writetime')
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
         self._rrd_update('DiskIO')
 
@@ -380,7 +380,7 @@ class _NetMonitor(Monitor):
             rrd.add_counter(lan + "tx")
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
         self._rrd_update('Network')
 

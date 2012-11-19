@@ -44,7 +44,7 @@ class _TplinkMonitor(Monitor):
         rrd.add_counter('tx')
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
         self._rrd_update('Tplink')
  
