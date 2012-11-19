@@ -15,10 +15,10 @@ from .rrd import Rrd
 
 class _TplinkMonitor(Monitor):
     def __init__(self, config):
+        super(_TplinkMonitor, self).__init__(config)
         user = '%s:%s' % (config.get('Tplink', 'user'),
                           config.get('Tplink', 'password'))
         host = config.get('Tplink', 'host')
-        self._data = ()
         self._cmd = self._run_command('curl -s --user ' + user + ' http://' +
                                       host + '/userRpm/StatusRpm.htm')
 
@@ -46,6 +46,6 @@ class _TplinkMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update(path + '/router.rrd')
+        self._rrd_update('Tplink')
  
 MONITORS['tplink'] = _TplinkMonitor

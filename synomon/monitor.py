@@ -6,7 +6,11 @@ import os
 
 from .rrd import Rrd
 
-class Monitor:
+class Monitor(object):
+    def __init__(self, config):
+        self._data = ()
+        self._config = config
+    
     def _run_command(self, cmd):
         try:
             return subprocess.check_output(cmd.split())
@@ -16,7 +20,8 @@ class Monitor:
     def _search(self, pattern, string):
         return re.search(pattern, string, re.MULTILINE)
 
-    def _rrd_update(self, filename):
+    def _rrd_update(self, section):
+        filename = self._config.get('Global', 'rrd_dir') + '/' + self._config.get(section, 'rrd')
         if not os.path.exists(filename):
             self.create(filename)
         Rrd(filename).update(self._data)
@@ -33,7 +38,7 @@ class Monitor:
 
 class _UptimeMonitor(Monitor):
     def __init__(self, config):
-        self._data = ()
+        super(_UptimeMonitor, self).__init__(config)
         try:
             with open("/proc/uptime") as f:
                 self._cmd = f.read()
@@ -61,14 +66,14 @@ class _UptimeMonitor(Monitor):
         rrd.add_counter('idle')
         rrd.create()
 
-    def update(self, path):
+    def update(self):
         self._parse()
-        self._rrd_update(path + '/uptime.rrd')
+        self._rrd_update('Uptime')
         
 
 class _LoadMonitor(Monitor):
     def __init__(self, config):
-        self._data = ()
+        super(_LoadMonitor, self).__init__(config)
         try:
             with open("/proc/loadavg") as f:
                 self._cmd = f.read()
@@ -97,12 +102,12 @@ class _LoadMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update(path + '/load.rrd')
+        self._rrd_update('Load')
         
 
 class _StatMonitor(Monitor):
     def __init__(self, config):
-        self._data = ()
+        super(_StatMonitor, self).__init__(config)
         try:
             with open("/proc/stat") as f:
                 self._cmd = f.readline()
@@ -138,12 +143,12 @@ class _StatMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update(path + '/stat.rrd')
+        self._rrd_update('Stat')
         
 
 class _MemMonitor(Monitor):
     def __init__(self, config):
-        self._data = ()
+        super(_MemMonitor, self).__init__(config)
         try:
             with open('/proc/meminfo') as f:
                 self._cmd = f.read()
@@ -184,16 +189,15 @@ class _MemMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update(path + '/memory.rrd')
+        self._rrd_update('Memory')
 
 
 class _VolMonitor(Monitor):
     def __init__(self, config):
-	items = config.items('Volumes')
-        self._volumes = [ i for i in items if i[0] != 'max_vols' ]
-        self._max_vols = config.getint('Volumes', 'max_vols')
+        super(_VolMonitor, self).__init__(config)
+	self._volumes = config.items('Volumes')
+        self._max_vols = config.getint('Volume', 'max_vols')
         self._cmd = self._run_command('df -m')
-        self._data = ()
 
     def _parse(self):
         temp = [ 0 ] * (2 * self._max_vols)
@@ -227,15 +231,15 @@ class _VolMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update(path + '/volumes.rrd')
+        self._rrd_update('Volume')
 
 
 class _HDMonitor(Monitor):
     def __init__(self, config):
+        super(_HDMonitor, self).__init__(config)
         self._hds = config.getlist('Disk', 'hds')
         self._max_hds = config.getint('Disk', 'max_hds')
         self._cmd = { }
-        self._data = ()
 
         for hd in self._hds:
             self._cmd[hd] = self._run_command('smartctl -d ata -A /dev/' + hd)
@@ -280,15 +284,15 @@ class _HDMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update(path + '/hds.rrd')
+        self._rrd_update('Disk')
 
 
 class _IOMonitor(Monitor):
     def __init__(self, config):
+        super(_IOMonitor, self).__init__(config)
         self._hds = config.getlist('Disk', 'hds')
         self._max_hds = config.getint('Disk', 'max_hds')
         self._cmd = { }
-        self._data = ()
 
         for hd in self._hds:
             try:
@@ -335,15 +339,15 @@ class _IOMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update(path + '/hdio.rrd')
+        self._rrd_update('DiskIO')
 
 
 class _NetMonitor(Monitor):
     def __init__(self, config):
+        super(_NetMonitor, self).__init__(config)
         self._ifaces = config.getlist('Network', 'ifaces')
         self._max_lan = config.getint('Network', 'max_lan')
         self._cmd = { }
-        self._data = ()
 
         for i in self._ifaces:
             self._cmd[i] = self._run_command("ifconfig " + i)
@@ -378,7 +382,8 @@ class _NetMonitor(Monitor):
 
     def update(self, path):
         self._parse()
-        self._rrd_update(path + '/network.rrd')
+        self._rrd_update('Network')
+
 
 MONITORS = {
     'uptime' : _UptimeMonitor,
@@ -386,8 +391,8 @@ MONITORS = {
     'stat'   : _StatMonitor,
     'memory' : _MemMonitor,
     'volume' : _VolMonitor,
-    'hd'     : _HDMonitor,
-    'io'     : _IOMonitor,
+    'disk'   : _HDMonitor,
+    'diskio' : _IOMonitor,
     'network': _NetMonitor
 }
 
