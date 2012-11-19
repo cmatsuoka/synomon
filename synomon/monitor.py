@@ -230,13 +230,13 @@ class VolMonitor(Monitor):
 
 
 class HDMonitor(Monitor):
-    def __init__(self, hds, max_hds):
-        self._hds = hds
-        self._max_hds = max_hds
+    def __init__(self, config):
+        self._hds = config.get_list('Disk', 'hds')
+        self._max_hds = config.get_int('Disk', 'max_hds')
         self._cmd = { }
         self._data = ()
 
-        for hd in hds:
+        for hd in self._hds:
             self._cmd[hd] = self._run_command('smartctl -d ata -A /dev/' + hd)
 
     def _parse(self):
@@ -283,13 +283,13 @@ class HDMonitor(Monitor):
 
 
 class IOMonitor(Monitor):
-    def __init__(self, hds, max_hds):
-        self._hds = hds
-        self._max_hds = max_hds
+    def __init__(self, config):
+        self._hds = config.get_list('Disk', 'hds')
+        self._max_hds = config.get_int('Disk', 'max_hds')
         self._cmd = { }
         self._data = ()
 
-        for hd in hds:
+        for hd in self._hds:
             try:
                 with open('/sys/block/' + hd + '/stat') as f:
                     self._cmd[hd] = map(int, f.readline().split())

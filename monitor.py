@@ -26,10 +26,8 @@ CONF_VOLUMES   = [
     ('/dev/vg2/volume_6', 'Vol6')
 ]
 
-CONF_HDS      = [ 'sda', 'sdb' ]
 CONF_IFACES   = [ 'eth0' ]
 
-CONF_MAX_HDS  = 2
 CONF_MAX_VOLS = 10
 CONF_MAX_LAN  = 1
 
@@ -39,8 +37,8 @@ def all_monitors(config):
     return [ RouterMonitor(config),
              UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
              VolMonitor(CONF_VOLUMES, CONF_MAX_VOLS),
-             HDMonitor(CONF_HDS, CONF_MAX_HDS),
-             IOMonitor(CONF_HDS, CONF_MAX_HDS),
+             HDMonitor(config),
+             IOMonitor(config),
              NetMonitor(CONF_IFACES, CONF_MAX_LAN) ]
 
 
@@ -74,9 +72,9 @@ if __name__ == '__main__':
         GRAPH.cpu('g1')
         GRAPH.load('g2')
         GRAPH.memory('g3')
-        GRAPH.hdtemp(CONF_HDS, 'g4')
-        GRAPH.hdio(CONF_HDS, 'g5')
-        #GRAPH.hdtime(CONF_HDS, 'g6')
+        GRAPH.hdtemp(config.get_list('Disk', 'hds'), 'g4')
+        GRAPH.hdio(config.get_list('Disk', 'hds'), 'g5')
+        #GRAPH.hdtime(config.get_list('Disk', 'hds', 'g6')
         GRAPH.volume(CONF_VOLUMES, 'g7')
         
     else:

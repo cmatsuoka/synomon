@@ -29,6 +29,12 @@ class Config:
         """
         return self._config.get(section, option)
 
+    def get_list(self, section, option):
+        return [ i.strip() for i in self.get(section, option).split(',') ]
+
+    def get_int(self, section, option):
+        return int(self.get(section, option))
+
     def _create_file(self):
         """Internal function to create a dummy config file if none is found"""
 
@@ -36,6 +42,10 @@ class Config:
         config.add_section('Global')
         config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
         config.set('Global', 'dest_dir', '/volume1/web/stats/')
+
+        config.add_section('Disk')
+        config.set('Disk', 'hds', 'sda,sdb')
+        config.set('Disk', 'max_hds', '2')
 
         config.add_section('Volume')
 
