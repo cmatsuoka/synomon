@@ -193,7 +193,7 @@ class Graph:
         self._set_filename(filename, view)
         graph = _GraphBuilder(self._path + '/load.rrd')
         graph.area('load_15', '#00c000', '15 min')
-        graph.line('load_1', '#0000c0', '1 min')
+        graph.line('load_5', '#0000c0', '5 min')
         graph.do_graph(self._filename, r'Active\ tasks', self._view, self._size)
 
     def memory(self, filename, width=0, height=0, view=''):

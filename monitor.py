@@ -39,7 +39,7 @@ CONF_MAX_LAN  = 1
 # FIXME: don't hardcode stuff
 
 def all_monitors():
-    return [ RouterMonitor('address', 'username:password'),
+    return [ RouterMonitor('address', 'user:password'),
              UptimeMonitor(), StatMonitor(), LoadMonitor(), MemMonitor(),
              VolMonitor(CONF_VOLUMES, CONF_MAX_VOLS),
              HDMonitor(CONF_HDS, CONF_MAX_HDS),

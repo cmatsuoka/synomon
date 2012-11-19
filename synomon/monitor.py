@@ -79,21 +79,20 @@ class LoadMonitor(Monitor):
         if self._cmd == None:
             self._data = 0, 0, 0
         else:
-            m = self._search("^([\d.]+) ([\d.]+) ([\d.]+) ", self._cmd)
-            self._data = tuple(map(float, m.group(1, 2, 3)))
+            m = self._search("^[\d.]+ ([\d.]+) ([\d.]+) ", self._cmd)
+            self._data = tuple(map(float, m.group(1, 2)))
 
     def show(self):
         self._parse()
         print "CPU load:"
-        print "    1m  average :", self._data[0]
-        print "    5m  average :", self._data[1]
-        print "    15m average :", self._data[2]
+        print "    5m  average :", self._data[0]
+        print "    15m average :", self._data[1]
         print
 
     def create(self, filename):
         rrd = Rrd(filename)
-        for i in [ 'load_1', 'load_5', 'load_15' ]:
-            rrd.add_gauge(i)
+        rrd.add_gauge('load_5')
+        rrd.add_gauge('load_15')
         rrd.create()
 
     def update(self, path):
