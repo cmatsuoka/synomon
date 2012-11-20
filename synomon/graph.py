@@ -165,7 +165,7 @@ class Graph:
         ''' Router traffic graph '''
         self._set_size(width, height)
         self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/router.rrd')
+        graph = _GraphBuilder(self._path + '/tplink.rrd')
         graph.area('rx', '#00c000', 'Network rx')
         graph.line('tx', '#0000c0', 'Network tx')
         graph.do_graph(self._filename, 'Bytes', self._view, self._size)
@@ -208,7 +208,7 @@ class Graph:
         ''' HD temperature graph '''
         self._set_size(width, height)
         self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/hds.rrd')
+        graph = _GraphBuilder(self._path + '/hd.rrd')
         graph.hdtemp(hds)
         graph.do_graph(self._filename, 'Celsius', self._view, self._size)
 

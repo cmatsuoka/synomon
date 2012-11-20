@@ -13,6 +13,7 @@ import re
 from ..monitor import Monitor, MONITORS
 from ..rrd import Rrd
 
+
 class _TplinkMonitor(Monitor):
     def __init__(self, config):
         super(_TplinkMonitor, self).__init__(config, 'tplink')
@@ -38,8 +39,8 @@ class _TplinkMonitor(Monitor):
                           self._cmd)
             self._data = tuple(map(int, m.group(1, 2)))
 
-    def _create(self, filename):
-        rrd = Rrd(filename)
+    def _create(self):
+        rrd = Rrd(self._rrd_name)
         rrd.add_counter('rx')
         rrd.add_counter('tx')
         rrd.create()

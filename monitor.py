@@ -48,8 +48,8 @@ if __name__ == '__main__':
         GRAPH.cpu('g1')
         GRAPH.load('g2')
         GRAPH.memory('g3')
-        GRAPH.hdtemp(config.getlist('Disk', 'hds'), 'g4')
-        GRAPH.hdio(config.getlist('Disk', 'hds'), 'g5')
+        GRAPH.hdtemp(config.getlist('Hd', 'hds'), 'g4')
+        GRAPH.hdio(config.getlist('Hd', 'hds'), 'g5')
         #GRAPH.hdtime(config.get_list('Disk', 'hds', 'g6')
         GRAPH.volume(config.items('VolumeList'), 'g7')
         

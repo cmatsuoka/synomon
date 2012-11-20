@@ -47,6 +47,9 @@ class Config:
                 return False
         return True
 
+    def has_section(self, section):
+        return self._config.has_section(section)
+
     def add_option(self, section, option, value):
         if not self._config.has_section(section):
             self._config.add_section(section)
@@ -67,34 +70,6 @@ class Config:
         config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
         config.set('Global', 'dest_dir', '/volume1/web/stats/')
         config.set('Global', 'monitors', 'uptime,stat,load,memory,volume,hd,io,network')
-
-        config.add_section('Stat')
-        config.set('Stat', 'rrd', 'stat.rrd')
-
-        config.add_section('Load')
-        config.set('Load', 'rrd', 'load.rrd')
-
-        config.add_section('Network')
-        config.set('Network', 'rrd', 'network.rrd')
-        config.set('Network', 'max_lan', '2')
-        config.set('Network', 'ifaces', 'eth0')
-
-        config.add_section('Disk')
-        config.set('Disk', 'rrd', 'hds.rrd')
-        config.set('Disk', 'max_hds', '2')
-        config.set('Disk', 'hds', 'sda,sdb')
-
-        config.add_section('DiskIO')
-        config.set('DiskIO', 'rrd', 'hdio.rrd')
-
-        config.add_section('Volumes')
-        config.set('Volumes', 'rrd', 'volumes.rrd')
-        config.set('Volumes', 'max_vols', '10')
-
-        config.add_section('VolumeList')
-        config.set('VolumeList', 'Sys', '/dev/md0')
-        config.set('VolumeList', 'Vol1', '/dev/vg1/volume_1')
-        config.set('VolumeList', 'Vol2', '/dev/vg1/volume_2')
 
         with open(self._file, 'w') as configfile:
             config.write(configfile)
