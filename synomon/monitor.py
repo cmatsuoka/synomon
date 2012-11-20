@@ -7,7 +7,9 @@ import os
 from .rrd import Rrd
 
 class Monitor(object):
-    def __init__(self, config):
+    def __init__(self, config, name=None):
+        if name != None:
+            self._name = name
         self._data = ()
         self._config = config
     
@@ -26,54 +28,27 @@ class Monitor(object):
             self.create(filename)
         Rrd(filename).update(self._data)
 
-    def create(self):
-        raise NotImplementedError
-
-    def show(self):
-        raise NotImplementedError
-
-    def update(self):
-        raise NotImplementedError
-
-
-class _UptimeMonitor(Monitor):
-    def __init__(self, config):
-        super(_UptimeMonitor, self).__init__(config)
-        try:
-            with open("/proc/uptime") as f:
-                self._cmd = f.read()
-        except:
-            self._cmd = None
-
     def _parse(self):
-        if self._cmd == None:
-            self._data = 0, 0
-        else:
-            m = self._search("^([\d]+)\.\d+ ([\d]+)\.", self._cmd)
-            self._data = tuple(map(int, m.group(1, 2)))
+        raise NotImplementedError
+
+    def _create(self, filename):
+        raise NotImplementedError
 
     def show(self):
-        self._parse()
-
-        print "Uptime:"
-        print "    Uptime seconds :", self._data[0]
-        print "    Idle seconds   :", self._data[1]
-        print
-
-    def create(self, filename):
-        rrd = Rrd(filename)
-        rrd.add_counter('uptime')
-        rrd.add_counter('idle')
-        rrd.create()
+        raise NotImplementedError
 
     def update(self):
         self._parse()
-        self._rrd_update('Uptime')
-        
+        rrd = self._name + '.rrd'
+        filename = self._config.get('Global', 'rrd_dir') + '/' + rrd
+        if not os.path.exists(filename):
+            self._create(filename)
+        Rrd(filename).update(self._data)
+
 
 class _LoadMonitor(Monitor):
     def __init__(self, config):
-        super(_LoadMonitor, self).__init__(config)
+        super(_LoadMonitor, self).__init__(config, 'load')
         try:
             with open("/proc/loadavg") as f:
                 self._cmd = f.read()
@@ -87,6 +62,12 @@ class _LoadMonitor(Monitor):
             m = self._search("^[\d.]+ ([\d.]+) ([\d.]+) ", self._cmd)
             self._data = tuple(map(float, m.group(1, 2)))
 
+    def _create(self, filename):
+        rrd = Rrd(filename)
+        rrd.add_gauge('load_5')
+        rrd.add_gauge('load_15')
+        rrd.create()
+
     def show(self):
         self._parse()
         print "CPU load:"
@@ -94,20 +75,10 @@ class _LoadMonitor(Monitor):
         print "    15m average :", self._data[1]
         print
 
-    def create(self, filename):
-        rrd = Rrd(filename)
-        rrd.add_gauge('load_5')
-        rrd.add_gauge('load_15')
-        rrd.create()
-
-    def update(self):
-        self._parse()
-        self._rrd_update('Load')
-        
 
 class _StatMonitor(Monitor):
     def __init__(self, config):
-        super(_StatMonitor, self).__init__(config)
+        super(_StatMonitor, self).__init__(config, 'stat')
         try:
             with open("/proc/stat") as f:
                 self._cmd = f.readline()
@@ -122,6 +93,13 @@ class _StatMonitor(Monitor):
                              self._cmd)
             self._data = tuple(map(int, m.group(1, 2, 3, 4, 5, 6, 7)))
 
+    def _create(self, filename):
+        rrd = Rrd(filename)
+        for i in [ 'stat_user', 'stat_nice', 'stat_system', 'stat_idle',
+                   'stat_iowait', 'stat_irq', 'stat_softirq' ]:
+            rrd.add_counter(i)
+        rrd.create()
+
     def show(self):
         self._parse()
         print 'CPU stats:'
@@ -134,21 +112,10 @@ class _StatMonitor(Monitor):
         print '    Softirq :', self._data[6]
         print
 
-    def create(self, filename):
-        rrd = Rrd(filename)
-        for i in [ 'stat_user', 'stat_nice', 'stat_system', 'stat_idle',
-                   'stat_iowait', 'stat_irq', 'stat_softirq' ]:
-            rrd.add_counter(i)
-        rrd.create()
-
-    def update(self):
-        self._parse()
-        self._rrd_update('Stat')
-        
 
 class _MemMonitor(Monitor):
     def __init__(self, config):
-        super(_MemMonitor, self).__init__(config)
+        super(_MemMonitor, self).__init__(config, 'memory')
         try:
             with open('/proc/meminfo') as f:
                 self._cmd = f.read()
@@ -167,6 +134,13 @@ class _MemMonitor(Monitor):
             t = t + (data,)
         self._data = t
 
+    def _create(self, filename):
+        rrd = Rrd(filename)
+        for i in [ 'mem_total', 'mem_free', 'mem_buffers', 'mem_cached',
+                   'mem_active', 'mem_inactive', 'swap_total', 'swap_free' ]:
+            rrd.add_gauge(i)
+        rrd.create()
+
     def show(self):
         self._parse()
         print 'Memory data:'
@@ -180,21 +154,10 @@ class _MemMonitor(Monitor):
         print '    SwapFree  :', self._data[7]
         print
 
-    def create(self, filename):
-        rrd = Rrd(filename)
-        for i in [ 'mem_total', 'mem_free', 'mem_buffers', 'mem_cached',
-                   'mem_active', 'mem_inactive', 'swap_total', 'swap_free' ]:
-            rrd.add_gauge(i)
-        rrd.create()
-
-    def update(self):
-        self._parse()
-        self._rrd_update('Memory')
-
 
 class _VolMonitor(Monitor):
     def __init__(self, config):
-        super(_VolMonitor, self).__init__(config)
+        super(_VolMonitor, self).__init__(config, 'volumes')
 	self._volumes = config.items('VolumeList')
         self._max_vols = config.getint('Volumes', 'max_vols')
         self._cmd = self._run_command('df -m')
@@ -207,6 +170,14 @@ class _VolMonitor(Monitor):
             temp[i], temp[i + 1] = tuple(map(int, m.group(1, 2)))
             i = i + 2
         self._data = temp
+
+    def _create(self, filename):
+        rrd = Rrd(filename)
+        for i in range(self._max_vols):
+            vol = "vol%d_" % (i)
+            rrd.add_gauge(vol + 'total')
+            rrd.add_gauge(vol + 'used')
+        rrd.create()
 
     def show(self):
         self._parse()
@@ -221,22 +192,10 @@ class _VolMonitor(Monitor):
             print
             i = i + 2
 
-    def create(self, filename):
-        rrd = Rrd(filename)
-        for i in range(self._max_vols):
-            vol = "vol%d_" % (i)
-            rrd.add_gauge(vol + 'total')
-            rrd.add_gauge(vol + 'used')
-        rrd.create()
-
-    def update(self):
-        self._parse()
-        self._rrd_update('Volumes')
-
 
 class _HDMonitor(Monitor):
     def __init__(self, config):
-        super(_HDMonitor, self).__init__(config)
+        super(_HDMonitor, self).__init__(config, 'hds')
         self._hds = config.getlist('Disk', 'hds')
         self._max_hds = config.getint('Disk', 'max_hds')
         self._cmd = { }
@@ -261,6 +220,15 @@ class _HDMonitor(Monitor):
 
         self._data = tuple(temp)
 
+    def _create(self, filename):
+        rrd = Rrd(filename)
+        for i in range(self._max_hds):
+            hd = "hd%d_" % i
+            rrd.add_gauge(hd + 'temp')
+            rrd.add_gauge(hd + 'hours')
+            rrd.add_gauge(hd + 'starts')
+        rrd.create()
+
     def show(self):
         self._parse()
         print 'Hard disk data:'
@@ -273,23 +241,9 @@ class _HDMonitor(Monitor):
             print
             i = i + 3
 
-    def create(self, filename):
-        rrd = Rrd(filename)
-        for i in range(self._max_hds):
-            hd = "hd%d_" % i
-            rrd.add_gauge(hd + 'temp')
-            rrd.add_gauge(hd + 'hours')
-            rrd.add_gauge(hd + 'starts')
-        rrd.create()
-
-    def update(self):
-        self._parse()
-        self._rrd_update('Disk')
-
-
 class _IOMonitor(Monitor):
     def __init__(self, config):
-        super(_IOMonitor, self).__init__(config)
+        super(_IOMonitor, self).__init__(config, 'hdio')
         self._hds = config.getlist('Disk', 'hds')
         self._max_hds = config.getint('Disk', 'max_hds')
         self._cmd = { }
@@ -314,6 +268,16 @@ class _IOMonitor(Monitor):
 
         self._data = temp
 
+    def _create(self, filename):
+        rrd = Rrd(filename)
+        for i in range(self._max_hds):
+            hd = "hd%d_" % i
+            rrd.add_counter(hd + 'reads')
+            rrd.add_counter(hd + 'readtime')
+            rrd.add_counter(hd + 'writes')
+            rrd.add_counter(hd + 'writetime')
+        rrd.create()
+
     def show(self):
         self._parse()
         print 'Hard disk I/O data:'
@@ -327,24 +291,10 @@ class _IOMonitor(Monitor):
             print
             i = i + 4
 
-    def create(self, filename):
-        rrd = Rrd(filename)
-        for i in range(self._max_hds):
-            hd = "hd%d_" % i
-            rrd.add_counter(hd + 'reads')
-            rrd.add_counter(hd + 'readtime')
-            rrd.add_counter(hd + 'writes')
-            rrd.add_counter(hd + 'writetime')
-        rrd.create()
-
-    def update(self):
-        self._parse()
-        self._rrd_update('DiskIO')
-
 
 class _NetMonitor(Monitor):
     def __init__(self, config):
-        super(_NetMonitor, self).__init__(config)
+        super(_NetMonitor, self).__init__(config, 'network')
         self._ifaces = config.getlist('Network', 'ifaces')
         self._max_lan = config.getint('Network', 'max_lan')
         self._cmd = { }
@@ -361,6 +311,14 @@ class _NetMonitor(Monitor):
             i += 2
         self._data = temp
 
+    def _create(self, filename):
+        rrd = Rrd(filename)
+        for i in range(self._max_lan):
+            lan = "eth%d_" % (i)
+            rrd.add_counter(lan + "rx")
+            rrd.add_counter(lan + "tx")
+        rrd.create()
+
     def show(self):
         self._parse()
         print "Network interface data:"
@@ -372,30 +330,20 @@ class _NetMonitor(Monitor):
             print
             i = i + 2
 
-    def create(self, filename):
-        rrd = Rrd(filename)
-        for i in range(self._max_lan):
-            lan = "eth%d_" % (i)
-            rrd.add_counter(lan + "rx")
-            rrd.add_counter(lan + "tx")
-        rrd.create()
-
-    def update(self):
-        self._parse()
-        self._rrd_update('Network')
-
 
 MONITORS = {
-    'uptime' : _UptimeMonitor,
     'load'   : _LoadMonitor,
     'stat'   : _StatMonitor,
     'memory' : _MemMonitor,
     'volume' : _VolMonitor,
-    'disk'   : _HDMonitor,
-    'diskio' : _IOMonitor,
+    'hd'     : _HDMonitor,
+    'hdio'   : _IOMonitor,
     'network': _NetMonitor
 }
 
 def monitors(config):
+    if not config.has_option('Global', 'monitors'):
+        config._create_file()
+
     return [ MONITORS[i](config) for i in config.getlist('Global', 'monitors') ]
 

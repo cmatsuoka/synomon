@@ -15,7 +15,7 @@ from synomon.config import Config
 from synomon.graph import Graph
 
 import synomon.monitor
-import synomon.tplink
+from synomon.monitors import *
 
 
 if __name__ == '__main__':

@@ -38,6 +38,27 @@ class Config:
     def items(self, section):
         return self._config.items(section)
 
+    def has_option(self, section, option):
+        return self._config.has_option(section, option)
+
+    def has_options(self, section, values):
+        for i in values:
+            if not self._config.has_option(section, i):
+                return False
+        return True
+
+    def add_option(self, section, option, value):
+        if not self._config.has_section(section):
+            self._config.add_section(section)
+        if not self._config.has_option(section, option):
+            self._config.set(section, option, value)
+
+    def add_section(self, section):
+        return self._config.add_section(section)
+
+    def set(self, section, option, value):
+        return self._config.set(section, option, value)
+
     def _create_file(self):
         """Internal function to create a dummy config file if none is found"""
 
@@ -46,9 +67,6 @@ class Config:
         config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
         config.set('Global', 'dest_dir', '/volume1/web/stats/')
         config.set('Global', 'monitors', 'uptime,stat,load,memory,volume,hd,io,network')
-
-        config.add_section('Uptime')
-        config.set('Uptime', 'rrd', 'uptime.rrd')
 
         config.add_section('Stat')
         config.set('Stat', 'rrd', 'stat.rrd')
@@ -78,13 +96,16 @@ class Config:
         config.set('VolumeList', 'Vol1', '/dev/vg1/volume_1')
         config.set('VolumeList', 'Vol2', '/dev/vg1/volume_2')
 
-        config.add_section('Tplink')
-        config.set('Tplink', 'host', '192.168.1.1')
-        config.set('Tplink', 'user', 'admin')
-        config.set('Tplink', 'password', 'password')
-
         with open(self._file, 'w') as configfile:
             config.write(configfile)
 
         print '\nPlease edit your config file %s\n' % (self._file)
         sys.exit()
+
+    def write(self):
+        with open(self._file, 'w') as configfile:
+            self._config.write(configfile)
+
+        print '\nPlease edit your config file %s\n' % (self._file)
+        sys.exit()
+

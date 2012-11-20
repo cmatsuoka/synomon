@@ -10,16 +10,24 @@ since this device doesn't offer a management service.
  
 import re
 
-from .monitor import Monitor, MONITORS
-from .rrd import Rrd
+from ..monitor import Monitor, MONITORS
+from ..rrd import Rrd
 
 class _TplinkMonitor(Monitor):
     def __init__(self, config):
-        super(_TplinkMonitor, self).__init__(config)
-        user = '%s:%s' % (config.get('Tplink', 'user'),
-                          config.get('Tplink', 'password'))
-        host = config.get('Tplink', 'host')
-        self._cmd = self._run_command('curl -s --user ' + user + ' http://' +
+        super(_TplinkMonitor, self).__init__(config, 'tplink')
+
+        if config.has_options('Tplink', [ 'host', 'user', 'password' ]):
+            host = config.get('Tplink', 'host')
+            user = config.get('Tplink', 'user')
+            password = config.get('Tplink', 'password')
+        else:
+            config.add_option('Txplink', 'host', '192.168.1.1.')
+            config.add_option('Txplink', 'user', 'admin')
+            config.add_option('Txplink', 'password', 'password')
+
+        userdef = '%s:%s' % (user, password)
+        self._cmd = self._run_command('curl -s --user ' + userdef + ' http://' +
                                       host + '/userRpm/StatusRpm.htm')
 
     def _parse(self):
@@ -30,6 +38,12 @@ class _TplinkMonitor(Monitor):
                           self._cmd)
             self._data = tuple(map(int, m.group(1, 2)))
 
+    def _create(self, filename):
+        rrd = Rrd(filename)
+        rrd.add_counter('rx')
+        rrd.add_counter('tx')
+        rrd.create()
+
     def show(self):
         self._parse()
 
@@ -38,14 +52,5 @@ class _TplinkMonitor(Monitor):
         print "    Sent     :", self._data[1]
         print
 
-    def create(self, filename):
-        rrd = Rrd(filename)
-        rrd.add_counter('rx')
-        rrd.add_counter('tx')
-        rrd.create()
 
-    def update(self):
-        self._parse()
-        self._rrd_update('Tplink')
- 
 MONITORS['tplink'] = _TplinkMonitor
