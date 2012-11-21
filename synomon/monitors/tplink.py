@@ -10,13 +10,15 @@ since this device doesn't offer a management service.
  
 import re
 
-from ..monitor import Monitor, MONITORS
+from ..monitor import Monitor, MONITOR
+from ..graph import Graph, GRAPH
 from ..rrd import Rrd
 
+_NAME = 'tplink'
 
 class _TplinkMonitor(Monitor):
     def __init__(self, config):
-        super(_TplinkMonitor, self).__init__(config, 'tplink')
+        super(_TplinkMonitor, self).__init__(config, _NAME)
 
         if config.has_options('Tplink', [ 'host', 'user', 'password' ]):
             self._host = config.get('Tplink', 'host')
@@ -52,4 +54,19 @@ class _TplinkMonitor(Monitor):
         print
 
 
-MONITORS['tplink'] = _TplinkMonitor
+class _TplinkGraph(Graph):
+    def __init__(self, config):
+        super(_TplinkGraph, self).__init__(config, _NAME)
+
+    def graph(self, width=0, height=0, view=''):
+        super(_TplinkGraph, self).graph(width, height, view)
+
+        g = self._build_graph('Bytes')
+        defs = g.defs([ 'rx', 'tx' ])
+        g.area(defs[0], '#00c000', 'Network rx')
+        g.line(defs[1], '#0000c0', 'Network tx')
+        g.do_graph()
+
+
+MONITOR[_NAME] = _TplinkMonitor
+GRAPH[_NAME]   = _TplinkGraph

@@ -9,7 +9,7 @@ isn't used because monitor polling is done each 5 minutes.
 
 import re
 
-from ..monitor import Monitor, MONITORS
+from ..monitor import Monitor, MONITOR
 from ..rrd import Rrd
 
 
@@ -39,4 +39,4 @@ class _LoadMonitor(Monitor):
         print
 
 
-MONITORS['load'] = _LoadMonitor
+MONITOR['load'] = _LoadMonitor

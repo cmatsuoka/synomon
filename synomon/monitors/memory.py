@@ -9,7 +9,7 @@ swap information from /proc/meminfo.
 
 import re
 
-from ..monitor import Monitor, MONITORS
+from ..monitor import Monitor, MONITOR
 from ..rrd import Rrd
 
 class _MemMonitor(Monitor):
@@ -55,4 +55,4 @@ class _MemMonitor(Monitor):
         print
 
 
-MONITORS['memory'] = _MemMonitor
+MONITOR['memory'] = _MemMonitor

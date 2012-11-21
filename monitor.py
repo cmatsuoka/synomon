@@ -42,16 +42,19 @@ if __name__ == '__main__':
         else:
             view = ''
 
-        GRAPH = Graph(config, height=150, width=480, view=view)
-        GRAPH.router('g8')
-        GRAPH.network('g0')
-        GRAPH.cpu('g1')
-        GRAPH.load('g2')
-        GRAPH.memory('g3')
-        GRAPH.hdtemp(config.getlist('Hd', 'hds'), 'g4')
-        GRAPH.hdio(config.getlist('Hd', 'hds'), 'g5')
-        #GRAPH.hdtime(config.get_list('Disk', 'hds', 'g6')
-        GRAPH.volume(config.items('VolumeList'), 'g7')
+        for i in synomon.graph.graphs(config):
+            i.graph()
+
+        #GRAPH = Graph(config, height=150, width=480, view=view)
+        #GRAPH.router('g8')
+        #GRAPH.network('g0')
+        #GRAPH.cpu('g1')
+        #GRAPH.load('g2')
+        #GRAPH.memory('g3')
+        #GRAPH.hdtemp(config.getlist('Hd', 'hds'), 'g4')
+        #GRAPH.hdio(config.getlist('Hd', 'hds'), 'g5')
+        ##GRAPH.hdtime(config.get_list('Disk', 'hds', 'g6')
+        #GRAPH.volume(config.items('VolumeList'), 'g7')
         
     else:
         print "Invalid command %s" % (sys.argv[1])

@@ -15,50 +15,37 @@ COLOR2 = [ '#800080', '#008080', '#0080c0', '#00c080' ]
 
 class _GraphBuilder:
     ''' Helpers to build a RRDtool graph using pyrrd calls '''
-    def __init__(self, rrd_file):
+    def __init__(self, rrd_file, filename, label, size, view):
         self._data = []
         self._rrd_file = rrd_file
+        self._filename = filename
+        self._label = label
+        self._size = size
+        self._view = view
 
-    def _def(self, vname='vname', dsname='dsname'):
+    def ddef(self, name):
         ''' Wrapper for DEF using our RRD file '''
-        return DEF(rrdfile=self._rrd_file, vname=vname, dsName=dsname)
+        def1 = DEF(rrdfile=self._rrd_file, vname=name, dsName=name)
+        self._data = self._data + [ def1 ]
+        return def1
 
-    def line(self, name, color, legend):
+    def defs(self, names):
+        return map(self.ddef, names)
+
+    def cdef(self, name, rpn):
+        cdef1 = CDEF(vname=name, rpn=rpn)
+        self._data = self._data + [ cdef1 ]
+        return cdef1
+
+    def line(self, defobj, color, legend):
         ''' Create RRDtool LINE definition '''
-        def1 = self._def(vname=name, dsname=name)
-        line1 = LINE(defObj=def1, color=color, legend=legend) 
-        self._data = self._data + [ def1, line1 ]
+        line1 = LINE(defObj=defobj, color=color, legend=legend) 
+        self._data = self._data + [ line1 ]
 
-    def area(self, name, color, legend):
+    def area(self, defobj, color, legend, stack=False):
         ''' Create RRDtool AREA definition '''
-        def1 = self._def(vname=name, dsname=name)
-        line1 = AREA(defObj=def1, color=color, legend=legend) 
-        self._data = self._data + [ def1, line1 ]
-
-    def cpu(self, color1, color2, color3, color5):
-        ''' Create CPU stat graph elements '''
-        def1 = self._def(vname='user'  , dsname='stat_user')
-        def2 = self._def(vname='nice'  , dsname='stat_nice')
-        def3 = self._def(vname='system', dsname='stat_system')
-        def4 = self._def(vname='idle'  , dsname='stat_idle')
-        def5 = self._def(vname='iowait', dsname='stat_iowait')
-        def6 = self._def(vname='irq'   , dsname='stat_irq')
-        def7 = self._def(vname='softirq', dsname='stat_softirq')
-        cdef = CDEF(vname='all', rpn='user,nice,+,system,+,idle,+,' +
-                          'iowait,+,irq,+,softirq,+')
-        cdef1 = CDEF(vname='puser'  , rpn='100,user,*,all,/')
-        cdef2 = CDEF(vname='pnice'  , rpn='100,nice,*,all,/')
-        cdef3 = CDEF(vname='psystem', rpn='100,system,*,all,/')
-        cdef5 = CDEF(vname='piowait', rpn='100,iowait,*,all,/')
-
-        area1 = AREA(defObj=cdef1, color=color1, legend='User', stack=True)
-        area2 = AREA(defObj=cdef2, color=color2, legend='Nice', stack=True)
-        area3 = AREA(defObj=cdef3, color=color3, legend='System', stack=True)
-        area5 = AREA(defObj=cdef5, color=color5, legend='IOwait', stack=True)
-
-        self._data = self._data + [ def1, def2, def3, def4, def5, def6, def7,
-                                    cdef, cdef1, cdef2, cdef3, cdef5, area3,
-                                    area1, area2, area5 ]
+        area1 = AREA(defObj=defobj, color=color, legend=legend, stack=stack) 
+        self._data = self._data + [ area1 ]
 
     def hdtemp(self, hds):
         ''' Create HD temperature graph elements '''
@@ -111,40 +98,42 @@ class _GraphBuilder:
 
             i = i + 1
 
-    def do_graph(self, path, label, view='', size=(0,0)):
+    def do_graph(self):
         ''' Create the graph image file '''
-        if path == '':
+        if self._filename == '':
             raise Exception("Invalid filename")
 
-        if view == 'y':
+        if self._view == 'y':
             start = 3600 * 24 * 365
-        elif view == 'm':
+        elif self._view == 'm':
             start = 3600 * 24 * 30
-        elif view == 'w':
+        elif self._view == 'w':
             start = 3600 * 24 * 7
         else:
             start = 3600 * 24
 
-        print "Write image", path
-        rrd_graph = RRDGraph(path, start=-start, end=-1, vertical_label=label)
+        print "Write image", self._filename
+        rrd_graph = RRDGraph(self._filename, start=-start, end=-1,
+                             vertical_label=self._label)
         rrd_graph.data.extend(self._data)
-        if size[0] > 0:
+        if self._size[0] > 0:
             rrd_graph.width = size[0]
-        if size[1] > 0:
+        if self._size[1] > 0:
             rrd_graph.height = size[1]
         #rrd_graph.write(debug=True)
         rrd_graph.write()
 
-class Graph:
+class Graph(object):
     ''' Create graphs for data stored in RRDs '''
-    def __init__(self, config, width=0, height=0, view=''):
-        self._path = config.get('Global', 'rrd_dir')
-        self._dest = config.get('Global', 'dest_dir')
+    def __init__(self, config, name, width=0, height=0):
+        self._config = config
+        self._name = name
         self._width = width
         self._height = height
-        self._view = view
+        self._dest_dir = config.get('Global', 'dest_dir')
+        self._rrd_name = config.get('Global', 'rrd_dir') + '/' + name + '.rrd'
+        self._view = ''
         self._size = ()
-        self._filename = ''
     
     def _set_size(self, width, height):
         ''' Set graph size '''
@@ -155,20 +144,16 @@ class Graph:
             size[1] = height
         self._size = tuple(size) 
 
-    def _set_filename(self, name, view):
-        ''' Set image file name '''
-        if view == '':
-            view = self._view
-        self._filename = self._dest + '/' + name + view + '.png'
-
-    def router(self, filename, width=0, height=0, view=''):
-        ''' Router traffic graph '''
+    def graph(self, width, height, view):
         self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/tplink.rrd')
-        graph.area('rx', '#00c000', 'Network rx')
-        graph.line('tx', '#0000c0', 'Network tx')
-        graph.do_graph(self._filename, 'Bytes', self._view, self._size)
+        self._view = view
+        if view != '':
+            view = '-' + view 
+        self._filename = self._dest_dir + '/' + self._name + view + '.png'
+
+    def _build_graph(self, label):
+        return _GraphBuilder(self._rrd_name, self._filename, label,
+                             self._size, self._view)
 
     def network(self, filename, width=0, height=0, view=''):
         ''' Network I/O graph '''
@@ -178,14 +163,6 @@ class Graph:
         graph.area('eth0_rx', '#00c000', 'Network rx')
         graph.line('eth0_tx', '#0000c0', 'Network tx')
         graph.do_graph(self._filename, 'Bytes', self._view, self._size)
-
-    def cpu(self, filename, width=0, height=0, view=''):
-        ''' CPU stats graph '''
-        self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/stat.rrd')
-        graph.cpu('#00c000', '#c0c000', '#0000c0', '#c00000')
-        graph.do_graph(self._filename, 'Percentage', self._view, self._size)
 
     def load(self, filename, width=0, height=0, view=''):
         ''' CPU load graph '''
@@ -242,3 +219,7 @@ class Graph:
         graph.volume(vols)
         graph.do_graph(self._filename, 'Percent', self._view, self._size)
 
+GRAPH = { }
+
+def graphs(config):
+    return [ GRAPH[i](config) for i in config.getlist('Global', 'graphs') ]

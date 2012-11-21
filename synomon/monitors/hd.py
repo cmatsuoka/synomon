@@ -8,7 +8,7 @@ Read hard disk temperature, power-on hours and start/stop counters.
 
 import re
 
-from ..monitor import Monitor, MONITORS
+from ..monitor import Monitor, MONITOR
 from ..rrd import Rrd
 
 
@@ -68,4 +68,4 @@ class _HDMonitor(Monitor):
             print
             i = i + 3
 
-MONITORS['hd'] = _HDMonitor
+MONITOR['hd'] = _HDMonitor

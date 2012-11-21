@@ -8,7 +8,7 @@ This module reads uptime seconds and idle seconds from /proc/uptime.
 
 import re
 
-from ..monitor import Monitor, MONITORS
+from ..monitor import Monitor, MONITOR
 from ..config import Config
 from ..rrd import Rrd
 
@@ -38,4 +38,4 @@ class _UptimeMonitor(Monitor):
         print "    Idle seconds   :", self._data[1]
         print
 
-MONITORS['uptime'] = _UptimeMonitor
+MONITOR['uptime'] = _UptimeMonitor

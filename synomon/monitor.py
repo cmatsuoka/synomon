@@ -42,11 +42,11 @@ class Monitor(object):
         Rrd(self._rrd_name).update(self._data)
 
 
-MONITORS = { }
+MONITOR = { }
 
 def monitors(config):
     if not config.has_option('Global', 'monitors'):
         config._create_file()
 
-    return [ MONITORS[i](config) for i in config.getlist('Global', 'monitors') ]
+    return [ MONITOR[i](config) for i in config.getlist('Global', 'monitors') ]
 

@@ -8,7 +8,7 @@ Check logical volume usage data.
 
 import re
 
-from ..monitor import Monitor, MONITORS
+from ..monitor import Monitor, MONITOR
 from ..rrd import Rrd
 
 
@@ -64,4 +64,4 @@ class _VolMonitor(Monitor):
             i = i + 2
 
 
-MONITORS['volumes'] = _VolMonitor
+MONITOR['volumes'] = _VolMonitor

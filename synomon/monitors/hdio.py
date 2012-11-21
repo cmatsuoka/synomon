@@ -9,7 +9,7 @@ from /sys/block.
 
 import re
 
-from ..monitor import Monitor, MONITORS
+from ..monitor import Monitor, MONITOR
 from ..rrd import Rrd
 
 
@@ -67,4 +67,4 @@ class _IOMonitor(Monitor):
             print
             i = i + 4
 
-MONITORS['hdio'] = _IOMonitor
+MONITOR['hdio'] = _IOMonitor
