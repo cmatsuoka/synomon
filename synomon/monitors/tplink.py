@@ -8,13 +8,12 @@ the TP-Link WR542G router (firmare 4.0.1) by reading its HTML status page
 since this device doesn't offer a management service.
 '''
  
-import re
-
 from ..monitor import Monitor, MONITOR
 from ..graph import Graph, GRAPH
 from ..rrd import Rrd
 
 _NAME = 'tplink'
+
 
 class _TplinkMonitor(Monitor):
     def __init__(self, config):

@@ -7,14 +7,16 @@ Check total memory, free memory, buffers, caches, active, inactive and
 swap information from /proc/meminfo.
 '''
 
-import re
-
 from ..monitor import Monitor, MONITOR
+from ..graph import Graph, GRAPH
 from ..rrd import Rrd
+
+_NAME = 'memory'
+
 
 class _MemMonitor(Monitor):
     def __init__(self, config):
-        super(_MemMonitor, self).__init__(config, 'memory')
+        super(_MemMonitor, self).__init__(config, _NAME)
 
     def _parse(self):
         try:
@@ -36,8 +38,8 @@ class _MemMonitor(Monitor):
 
     def _create(self):
         rrd = Rrd(self._rrd_name)
-        for i in [ 'mem_total', 'mem_free', 'mem_buffers', 'mem_cached',
-                   'mem_active', 'mem_inactive', 'swap_total', 'swap_free' ]:
+        for i in [ 'total', 'free', 'buffers', 'cached', 'active',
+                   'inactive', 'swap_total', 'swap_free' ]:
             rrd.add_gauge(i)
         rrd.create()
 
@@ -55,4 +57,24 @@ class _MemMonitor(Monitor):
         print
 
 
-MONITOR['memory'] = _MemMonitor
+class _MemGraph(Graph):
+    def __init__(self, config):
+        super(_MemGraph, self).__init__(config, _NAME, _NAME)
+
+    def graph(self, width=0, height=0, view=''):
+        super(_MemGraph, self).graph(width, height, view)
+
+        g = self._build_graph('Bytes')
+        defs = g.defs([ 'total', 'free', 'buffers', 'cached' ])
+        cdef1 = g.cdef('used', 'total,free,-,buffers,-,cached,-')
+        g.area(cdef1, '#00c000', 'Used', stack=True)
+        g.area(defs[2], '#0000c0', 'Buffers', stack=True)
+        g.area(defs[3], '#00c0c0c0', 'Cached', stack=True)
+	defs = g.defs([ 'swap_total', 'swap_free' ])
+        cdef2 = g.cdef('swap', 'swap_total,swap_free,-')
+        g.line(cdef2, '#c00000', 'Swap')
+        g.do_graph()
+
+
+MONITOR[_NAME] = _MemMonitor
+GRAPH[_NAME]   = _MemGraph

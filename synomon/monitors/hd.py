@@ -6,13 +6,12 @@ Get hard disk information
 Read hard disk temperature, power-on hours and start/stop counters.
 '''
 
-import re
-
 from ..monitor import Monitor, MONITOR
 from ..graph import Graph, GRAPH
 from ..rrd import Rrd
 
 _NAME = 'hd'
+
 
 class _HDMonitor(Monitor):
     def __init__(self, config):

@@ -7,13 +7,12 @@ Read /proc/loadavg to get 5 and 15 minute load average, 1 minute average
 isn't used because monitor polling is done each 5 minutes.
 '''
 
-import re
-
 from ..monitor import Monitor, MONITOR
 from ..graph import Graph, GRAPH
 from ..rrd import Rrd
 
 _NAME = 'load'
+
 
 class _LoadMonitor(Monitor):
     def __init__(self, config):

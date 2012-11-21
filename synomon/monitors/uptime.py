@@ -6,16 +6,16 @@ Read uptime information
 This module reads uptime seconds and idle seconds from /proc/uptime.
 '''
 
-import re
-
 from ..monitor import Monitor, MONITOR
-from ..config import Config
+from ..graph import Graph, GRAPH
 from ..rrd import Rrd
+
+_NAME = 'uptime'
 
 
 class _UptimeMonitor(Monitor):
     def __init__(self, config):
-        super(_UptimeMonitor, self).__init__(config, 'uptime')
+        super(_UptimeMonitor, self).__init__(config, _NAME)
 
     def _parse(self):
         try:
@@ -38,4 +38,4 @@ class _UptimeMonitor(Monitor):
         print "    Idle seconds   :", self._data[1]
         print
 
-MONITOR['uptime'] = _UptimeMonitor
+MONITOR[_NAME] = _UptimeMonitor

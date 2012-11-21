@@ -6,13 +6,12 @@ Read CPU usage information
 This module reads CPU counters information from /proc/stat.
 '''
 
-import re
-
 from ..monitor import Monitor, MONITOR
 from ..graph import Graph, GRAPH
 from ..rrd import Rrd
 
 _NAME = 'cpu'
+
 
 class _CpuMonitor(Monitor):
     def __init__(self, config):

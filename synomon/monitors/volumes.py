@@ -6,15 +6,16 @@ Read volume information
 Check logical volume usage data.
 '''
 
-import re
-
 from ..monitor import Monitor, MONITOR
+from ..graph import Graph, GRAPH
 from ..rrd import Rrd
+
+_NAME = 'volumes'
 
 
 class _VolMonitor(Monitor):
     def __init__(self, config):
-        super(_VolMonitor, self).__init__(config, 'volumes')
+        super(_VolMonitor, self).__init__(config, _NAME)
 
         if config.has_option('Volumes', 'max_vols'):
             self._max_vols = config.getint('Volumes', 'max_vols')
@@ -64,4 +65,4 @@ class _VolMonitor(Monitor):
             i = i + 2
 
 
-MONITOR['volumes'] = _VolMonitor
+MONITOR[_NAME] = _VolMonitor

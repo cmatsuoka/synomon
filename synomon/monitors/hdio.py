@@ -7,15 +7,16 @@ Read number of sectors read/written in hard disks and read/write time
 from /sys/block.
 '''
 
-import re
-
 from ..monitor import Monitor, MONITOR
+from ..graph import Graph, GRAPH
 from ..rrd import Rrd
+
+_NAME = 'hdio'
 
 
 class _IOMonitor(Monitor):
     def __init__(self, config):
-        super(_IOMonitor, self).__init__(config, 'hdio')
+        super(_IOMonitor, self).__init__(config, _NAME)
 
         if config.has_options('Hd', [ 'hds', 'max_hds' ]):
             self._hds = config.getlist('Hd', 'hds')
@@ -67,4 +68,5 @@ class _IOMonitor(Monitor):
             print
             i = i + 4
 
-MONITOR['hdio'] = _IOMonitor
+
+MONITOR[_NAME] = _IOMonitor

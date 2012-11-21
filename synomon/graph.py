@@ -44,23 +44,6 @@ class _GraphBuilder:
         area1 = AREA(defObj=defobj, color=color, legend=legend, stack=stack) 
         self._data = self._data + [ area1 ]
 
-    def memory(self, color1, color2, color3, color4):
-        ''' Create memory usage graph elements '''
-        def1 = self._def(vname='tot', dsname='mem_total')
-        def2 = self._def(vname='fre', dsname='mem_free')
-        def3 = self._def(vname='buf', dsname='mem_buffers')
-        def4 = self._def(vname='cac', dsname='mem_cached')
-        cdef1 = CDEF(vname='used', rpn='tot,fre,-,buf,-,cac,-')
-        area1 = AREA(defObj=cdef1, color=color1, legend='Used', stack=True)
-        area2 = AREA(defObj=def3, color=color2, legend='Buffers', stack=True)
-        area3 = AREA(defObj=def4, color=color3, legend='Cached', stack=True)
-        def5 = self._def(vname='swt', dsname='swap_total')
-        def6 = self._def(vname='swf', dsname='swap_free')
-        cdef2 = CDEF(vname='swap', rpn='swt,swf,-')
-        line5 = LINE(defObj=cdef2, color=color4, legend='Swap')
-        self._data = self._data + [ def1, def2, def3, def4, cdef1, area1,
-                                    area2, area3, def5, def6, cdef2, line5 ]
-
     def volume(self, vols):
         ''' Create volume usage graph elements '''
         def1 = [ ]
@@ -146,14 +129,6 @@ class Graph(object):
     def _build_graph(self, label):
         return _GraphBuilder(self._rrd_name, self._filename, label,
                              self._size, self._view)
-
-    def memory(self, filename, width=0, height=0, view=''):
-        ''' Memory usage graph '''
-        self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/memory.rrd')
-        graph.memory('#00c000', '#0000c0', '#00c0c0c0', '#c00000')
-        graph.do_graph(self._filename, 'KBytes', self._view, self._size)
 
     def hdio(self, hds, filename, width=0, height=0, view=''):
         ''' HD I/O graph '''
