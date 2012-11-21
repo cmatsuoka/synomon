@@ -49,7 +49,7 @@ class _CpuMonitor(Monitor):
 
 class _CpuGraph(Graph):
     def __init__(self, config):
-        super(_CpuGraph, self).__init__(config, _NAME)
+        super(_CpuGraph, self).__init__(config, _NAME, _NAME)
 
     def graph(self, width=0, height=0, view=''):
         super(_CpuGraph, self).graph(width, height, view)

@@ -56,7 +56,7 @@ class _TplinkMonitor(Monitor):
 
 class _TplinkGraph(Graph):
     def __init__(self, config):
-        super(_TplinkGraph, self).__init__(config, _NAME)
+        super(_TplinkGraph, self).__init__(config, _NAME, _NAME)
 
     def graph(self, width=0, height=0, view=''):
         super(_TplinkGraph, self).graph(width, height, view)

@@ -9,12 +9,14 @@ Read hard disk temperature, power-on hours and start/stop counters.
 import re
 
 from ..monitor import Monitor, MONITOR
+from ..graph import Graph, GRAPH
 from ..rrd import Rrd
 
+_NAME = 'hd'
 
 class _HDMonitor(Monitor):
     def __init__(self, config):
-        super(_HDMonitor, self).__init__(config, 'hd')
+        super(_HDMonitor, self).__init__(config, _NAME)
 
         if config.has_options('Hd', [ 'hds', 'max_hds' ]):
             self._hds = config.getlist('Hd', 'hds')
@@ -68,4 +70,27 @@ class _HDMonitor(Monitor):
             print
             i = i + 3
 
-MONITOR['hd'] = _HDMonitor
+
+class _HDTempGraph(Graph):
+    def __init__(self, config):
+        super(_HDTempGraph, self).__init__(config, _NAME, 'hdtemp')
+
+    def graph(self, width=0, height=0, view=''):
+        super(_HDTempGraph, self).graph(width, height, view)
+
+        hds = self._config.getlist('Hd', 'hds')
+
+        g = self._build_graph('Celsius')
+
+        for i in range(len(hds)):
+            name = "hd%d_temp" % (i)
+            legend =  "HD%d temperature" % (i + 1)
+            g.line(g.ddef(name), self._color1[i] + '40', '')
+            cdef1 = g.cdef(name + '_t', '%s,3000,TREND' % (name))
+            g.line(cdef1, self._color1[i], legend, 2)
+
+        g.do_graph()
+
+
+MONITOR[_NAME]  = _HDMonitor
+GRAPH['hdtemp'] = _HDTempGraph

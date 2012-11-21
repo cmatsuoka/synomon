@@ -9,9 +9,6 @@ This class encapsulates pyrrd graph building calls.
 from pyrrd.graph import DEF, CDEF, LINE, AREA
 from pyrrd.graph import Graph as RRDGraph
 
-COLOR1 = [ '#c00000', '#00c000', '#0000c0', '#c0c000', '#c08000',
-           '#8000c0', '#00c0c0', '#c000c0', '#804000', '#408040' ]
-COLOR2 = [ '#800080', '#008080', '#0080c0', '#00c080' ]
 
 class _GraphBuilder:
     ''' Helpers to build a RRDtool graph using pyrrd calls '''
@@ -37,26 +34,15 @@ class _GraphBuilder:
         self._data = self._data + [ cdef1 ]
         return cdef1
 
-    def line(self, defobj, color, legend):
+    def line(self, defobj, color, legend, width=1):
         ''' Create RRDtool LINE definition '''
-        line1 = LINE(defObj=defobj, color=color, legend=legend) 
+        line1 = LINE(defObj=defobj, color=color, legend=legend, width=width) 
         self._data = self._data + [ line1 ]
 
     def area(self, defobj, color, legend, stack=False):
         ''' Create RRDtool AREA definition '''
         area1 = AREA(defObj=defobj, color=color, legend=legend, stack=stack) 
         self._data = self._data + [ area1 ]
-
-    def hdtemp(self, hds):
-        ''' Create HD temperature graph elements '''
-        for i in range(len(hds)):
-            name = "hd%d_temp" % (i)
-            legend =  "HD%d temperature" % (i + 1)
-            def1 = self._def(vname=name, dsname=name)
-            line1 = LINE(defObj=def1, color=COLOR1[i] + '40') 
-            cdef1 = CDEF(vname=name + '_t', rpn="%s,3000,TREND" % (name))
-            line2 = LINE(defObj=cdef1, color=COLOR1[i], width=2, legend=legend)
-            self._data = self._data + [ def1, line1, cdef1, line2 ]
 
     def memory(self, color1, color2, color3, color4):
         ''' Create memory usage graph elements '''
@@ -125,9 +111,15 @@ class _GraphBuilder:
 
 class Graph(object):
     ''' Create graphs for data stored in RRDs '''
-    def __init__(self, config, name, width=0, height=0):
+
+    _color1 = [ '#c00000', '#00c000', '#0000c0', '#c0c000', '#c08000',
+           '#8000c0', '#00c0c0', '#c000c0', '#804000', '#408040' ]
+    _color2 = [ '#800080', '#008080', '#0080c0', '#00c080' ]
+
+    def __init__(self, config, name, gname, width=0, height=0):
         self._config = config
         self._name = name
+        self._gname = gname
         self._width = width
         self._height = height
         self._dest_dir = config.get('Global', 'dest_dir')
@@ -149,7 +141,7 @@ class Graph(object):
         self._view = view
         if view != '':
             view = '-' + view 
-        self._filename = self._dest_dir + '/' + self._name + view + '.png'
+        self._filename = self._dest_dir + '/' + self._gname + view + '.png'
 
     def _build_graph(self, label):
         return _GraphBuilder(self._rrd_name, self._filename, label,
@@ -180,14 +172,6 @@ class Graph(object):
         graph = _GraphBuilder(self._path + '/memory.rrd')
         graph.memory('#00c000', '#0000c0', '#00c0c0c0', '#c00000')
         graph.do_graph(self._filename, 'KBytes', self._view, self._size)
-
-    def hdtemp(self, hds, filename, width=0, height=0, view=''):
-        ''' HD temperature graph '''
-        self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/hd.rrd')
-        graph.hdtemp(hds)
-        graph.do_graph(self._filename, 'Celsius', self._view, self._size)
 
     def hdio(self, hds, filename, width=0, height=0, view=''):
         ''' HD I/O graph '''
