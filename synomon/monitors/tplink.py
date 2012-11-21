@@ -19,25 +19,23 @@ class _TplinkMonitor(Monitor):
         super(_TplinkMonitor, self).__init__(config, 'tplink')
 
         if config.has_options('Tplink', [ 'host', 'user', 'password' ]):
-            host = config.get('Tplink', 'host')
-            user = config.get('Tplink', 'user')
-            password = config.get('Tplink', 'password')
+            self._host = config.get('Tplink', 'host')
+            self._user = config.get('Tplink', 'user')
+            self._password = config.get('Tplink', 'password')
         else:
             config.add_option('Txplink', 'host', '192.168.1.1.')
             config.add_option('Txplink', 'user', 'admin')
             config.add_option('Txplink', 'password', 'password')
 
-        userdef = '%s:%s' % (user, password)
-        self._cmd = self._run_command('curl -s --user ' + userdef + ' http://' +
-                                      host + '/userRpm/StatusRpm.htm')
-
     def _parse(self):
-        if self._cmd == None:
-            self._data = 0, 0
-        else:
-            m = re.search(r'var statistList = new Array\(\n(\d+), (\d+)',
-                          self._cmd)
+        userdef = '%s:%s' % (self._user, self._password)
+        try:
+            cmd = self._run_command('curl -s --user ' + userdef + ' http://' +
+                                    self._host + '/userRpm/StatusRpm.htm')
+            m = re.search(r'var statistList = new Array\(\n(\d+), (\d+)', cmd)
             self._data = tuple(map(int, m.group(1, 2)))
+        except:
+            self._data = 0, 0
 
     def _create(self):
         rrd = Rrd(self._rrd_name)

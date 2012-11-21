@@ -11,16 +11,16 @@ or hard disks reserve space for them in the CONF_MAX_* variables.
 
 import sys
 
-from synomon.config import Config
 from synomon.graph import Graph
 
+import synomon.config
 import synomon.monitor
 from synomon.monitors import *
 
 
 if __name__ == '__main__':
 
-    config = Config()
+    config = synomon.config.Config()
 
     if len(sys.argv) < 2:
         print "Usage: %s [ show | update | report ]" % (sys.argv[0])

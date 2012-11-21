@@ -24,27 +24,25 @@ class _IOMonitor(Monitor):
             config.add_option('Hd', 'hds', 'sda,sdb')
             config.add_option('Hd', 'max_hds', 2)
 
-        self._cmd = { }
-
+    def _parse(self):
+        cmd = { }
         for hd in self._hds:
             try:
                 with open('/sys/block/' + hd + '/stat') as f:
-                    self._cmd[hd] = map(int, f.readline().split())
+                    cmd[hd] = map(int, f.readline().split())
             except:
-                self._cmd[hd] = [ 0 ] * 11
+                cmd[hd] = [ 0 ] * 11
 
-    def _parse(self):
         temp = [ 0 ] * (4 * self._max_hds)
         i = 0
         for hd in self._hds:
-            line = self._cmd[hd]
-            temp[i] = line[2]
-            temp[i + 1] = line[2]
-            temp[i + 2] = line[6]
-            temp[i + 3] = line[7]
+            temp[i] = cmd[hd][2]
+            temp[i + 1] = cmd[hd][2]
+            temp[i + 2] = cmd[hd][6]
+            temp[i + 3] = cmd[hd][7]
             i = i + 4
 
-        self._data = temp
+        self._data = tuple(temp)
 
     def _create(self):
         rrd = Rrd(self._rrd_name)

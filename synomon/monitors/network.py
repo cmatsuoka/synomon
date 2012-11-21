@@ -24,16 +24,16 @@ class _NetMonitor(Monitor):
             config.add_option('Network', 'ifaces', 'eth0')
             config.add_option('Network', 'max_lan', 1)
 
-        self._cmd = { }
-
-        for i in self._ifaces:
-            self._cmd[i] = self._run_command("ifconfig " + i)
 
     def _parse(self):
+        cmd = { }
+        for i in self._ifaces:
+            cmd[i] = self._run_command("ifconfig " + i)
+
         temp = [ 0 ] * (2 * self._max_lan)
         i = 0
         for iface in self._ifaces:
-            m = self._search("RX bytes:(\d+) .*TX bytes:(\d+)", self._cmd[iface])
+            m = self._search("RX bytes:(\d+) .*TX bytes:(\d+)", cmd[iface])
             temp[i], temp[i + 1] = tuple(map(int, m.group(1, 2)))
             i += 2
         self._data = temp

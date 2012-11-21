@@ -16,18 +16,14 @@ from ..rrd import Rrd
 class _LoadMonitor(Monitor):
     def __init__(self, config):
         super(_LoadMonitor, self).__init__(config, 'load')
-        try:
-            with open("/proc/loadavg") as f:
-                self._cmd = f.read()
-        except:
-            self._cmd = None
 
     def _parse(self):
-        if self._cmd == None:
+        try:
+            with open("/proc/loadavg") as f:
+                m = self._search("^[\d.]+ ([\d.]+) ([\d.]+) ", f.read())
+                self._data = tuple(map(float, m.group(1, 2)))
+        except:
             self._data = 0, 0, 0
-        else:
-            m = self._search("^[\d.]+ ([\d.]+) ([\d.]+) ", self._cmd)
-            self._data = tuple(map(float, m.group(1, 2)))
 
     def _create(self):
         rrd = Rrd(self._rrd_name)

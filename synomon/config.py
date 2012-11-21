@@ -14,10 +14,22 @@ class Config:
     def __init__(self):
         self._file = os.path.join('/opt/etc/monitor.conf')
 
-        if not os.path.isfile(self._file):
-            self._create_file()
-
         self._config = ConfigParser.ConfigParser()
+
+        if not os.path.isfile(self._file):
+           config.add_section('Global')
+           config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
+           config.set('Global', 'dest_dir', '/volume1/web/stats/')
+           config.set('Global', 'monitors', 'uptime,stat,load,memory,volume,hd,io,network')
+        else:
+            self._config.read(self._file)
+
+        #with open(self._file, 'w') as configfile:
+        #    config.write(configfile)
+        #
+        #print '\nPlease edit your config file %s\n' % (self._file)
+        #sys.exit()
+
         self._config.read(self._file)
 
     def get(self, section, option):
@@ -64,18 +76,6 @@ class Config:
 
     def _create_file(self):
         """Internal function to create a dummy config file if none is found"""
-
-        config = ConfigParser.ConfigParser()
-        config.add_section('Global')
-        config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
-        config.set('Global', 'dest_dir', '/volume1/web/stats/')
-        config.set('Global', 'monitors', 'uptime,stat,load,memory,volume,hd,io,network')
-
-        with open(self._file, 'w') as configfile:
-            config.write(configfile)
-
-        print '\nPlease edit your config file %s\n' % (self._file)
-        sys.exit()
 
     def write(self):
         with open(self._file, 'w') as configfile:

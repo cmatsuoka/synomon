@@ -15,20 +15,21 @@ from ..rrd import Rrd
 class _MemMonitor(Monitor):
     def __init__(self, config):
         super(_MemMonitor, self).__init__(config, 'memory')
-        try:
-            with open('/proc/meminfo') as f:
-                self._cmd = f.read()
-        except:
-            self._cmd = None
 
     def _parse(self):
+        try:
+            with open('/proc/meminfo') as f:
+                cmd = f.read()
+        except:
+            cmd = None
+
         t = ()
         for parm in [ 'MemTotal', 'MemFree', 'Buffers', 'Cached', 'Active',
                       'Inactive', 'SwapTotal', 'SwapFree' ]:
-            if self._cmd == None:
+            if cmd == None:
                 data = 0
             else:
-                m = self._search('^' + parm + ':.* (\d+) ', self._cmd)
+                m = self._search('^' + parm + ':.* (\d+) ', cmd)
                 data = int(m.group(1))
             t = t + (data,)
         self._data = t

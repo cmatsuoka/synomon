@@ -28,14 +28,18 @@ class _VolMonitor(Monitor):
             config.add_option('VolumeList', 'vol1', '/dev/vg1/volume_1')
             config.add_option('VolumeList', 'vol2', '/dev/vg1/volume_2')
 
-        self._cmd = self._run_command('df -m')
     def _parse(self):
         temp = [ 0 ] * (2 * self._max_vols)
-        i = 0
-        for v in self._volumes:
-            m = self._search('^' + v[1] + '\s+(\d+)\s+(\d+)', self._cmd)
-            temp[i], temp[i + 1] = tuple(map(int, m.group(1, 2)))
-            i = i + 2
+        try:
+            cmd = self._run_command('df -m')
+            i = 0
+            for v in self._volumes:
+                m = self._search('^' + v[1] + '\s+(\d+)\s+(\d+)', cmd)
+                temp[i], temp[i + 1] = tuple(map(int, m.group(1, 2)))
+                i = i + 2
+        except:
+            pass
+
         self._data = temp
 
     def _create(self):

@@ -16,19 +16,15 @@ from ..rrd import Rrd
 class _StatMonitor(Monitor):
     def __init__(self, config):
         super(_StatMonitor, self).__init__(config, 'stat')
-        try:
-            with open("/proc/stat") as f:
-                self._cmd = f.readline()
-        except:
-            self._cmd = None
 
     def _parse(self):
-        if self._cmd == None:
+        try:
+            with open("/proc/stat") as f:
+                m = self._search('cpu\s+(\d+) (\d+) (\d+) (\d+) (\d+) ' +
+                                 '(\d+) (\d+)', r.readline())
+                self._data = tuple(map(int, m.group(1, 2, 3, 4, 5, 6, 7)))
+        except:
             self._data = 0, 0, 0, 0, 0, 0, 0
-        else:
-            m = self._search('cpu\s+(\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+)',
-                             self._cmd)
-            self._data = tuple(map(int, m.group(1, 2, 3, 4, 5, 6, 7)))
 
     def _create(self):
         rrd = Rrd(self._rrd_name)

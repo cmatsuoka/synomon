@@ -23,22 +23,24 @@ class _HDMonitor(Monitor):
             config.add_option('Hd', 'hds', 'sda,sdb')
             config.add_option('Hd', 'max_hds', 2)
 
-        self._cmd = { }
-
-        for hd in self._hds:
-            self._cmd[hd] = self._run_command('smartctl -d ata -A /dev/' + hd)
-
     def _parse(self):
+        cmd = { }
+        for hd in self._hds:
+            try:
+                cmd[hd] = self._run_command('smartctl -d ata -A /dev/' + hd)
+            except:
+                cmd[hd] = None
+
         temp = [ 0 ] * (3 * self._max_hds)
         i = 0
         for hd in self._hds:
-            if self._cmd[hd] == None:
+            if cmd[hd] == None:
                 data = [ 0, 0, 0 ] 
             else:
                 data = [ ]
                 for parm in [ 'Temperature_Celsius', 'Power_On_Hours',
                               'Start_Stop_Count' ]:
-                   m = self._search(parm + ' .* (\d+)( \(.*\))?$', self._cmd[hd])
+                   m = self._search(parm + ' .* (\d+)( \(.*\))?$', cmd[hd])
                    data.append(int(m.group(1)))
             temp[i], temp[i + 1], temp[i + 2] = data
             i = i + 3

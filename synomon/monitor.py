@@ -15,10 +15,7 @@ class Monitor(object):
         self._rrd_name = config.get('Global', 'rrd_dir') + '/' + name + '.rrd'
     
     def _run_command(self, cmd):
-        try:
-            return subprocess.check_output(cmd.split())
-        except:
-            return None
+        return subprocess.check_output(cmd.split())
 
     def _search(self, pattern, string):
         return re.search(pattern, string, re.MULTILINE)
