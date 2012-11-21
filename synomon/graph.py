@@ -147,24 +147,6 @@ class Graph(object):
         return _GraphBuilder(self._rrd_name, self._filename, label,
                              self._size, self._view)
 
-    def network(self, filename, width=0, height=0, view=''):
-        ''' Network I/O graph '''
-        self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/network.rrd')
-        graph.area('eth0_rx', '#00c000', 'Network rx')
-        graph.line('eth0_tx', '#0000c0', 'Network tx')
-        graph.do_graph(self._filename, 'Bytes', self._view, self._size)
-
-    def load(self, filename, width=0, height=0, view=''):
-        ''' CPU load graph '''
-        self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/load.rrd')
-        graph.area('load_15', '#00c000', '15 min')
-        graph.line('load_5', '#0000c0', '5 min')
-        graph.do_graph(self._filename, r'Active\ tasks', self._view, self._size)
-
     def memory(self, filename, width=0, height=0, view=''):
         ''' Memory usage graph '''
         self._set_size(width, height)

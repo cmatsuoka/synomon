@@ -10,12 +10,14 @@ isn't used because monitor polling is done each 5 minutes.
 import re
 
 from ..monitor import Monitor, MONITOR
+from ..graph import Graph, GRAPH
 from ..rrd import Rrd
 
+_NAME = 'load'
 
 class _LoadMonitor(Monitor):
     def __init__(self, config):
-        super(_LoadMonitor, self).__init__(config, 'load')
+        super(_LoadMonitor, self).__init__(config, _NAME)
 
     def _parse(self):
         try:
@@ -39,4 +41,19 @@ class _LoadMonitor(Monitor):
         print
 
 
-MONITOR['load'] = _LoadMonitor
+class _LoadGraph(Graph):
+    def __init__(self, config):
+        super(_LoadGraph, self).__init__(config, _NAME, _NAME)
+
+    def graph(self, width=0, height=0, view=''):
+        super(_LoadGraph, self).graph(width, height, view)
+
+        g = self._build_graph(r'Active\ tasks')
+        defs = g.defs([ 'load_15', 'load_5' ])
+        g.area(defs[0], '#00c000', '15 min')
+        g.line(defs[1], '#0000c0', '5 min')
+        g.do_graph()
+
+
+MONITOR[_NAME] = _LoadMonitor
+GRAPH[_NAME]   = _LoadGraph
