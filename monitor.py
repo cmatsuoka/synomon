@@ -43,12 +43,9 @@ if __name__ == '__main__':
             view = ''
 
         for i in synomon.graph.graphs(config):
-            i.graph()
+            i.graph(height=150, width=480, view=view)
 
         #GRAPH = Graph(config, height=150, width=480, view=view)
-        #GRAPH.router('g8')
-        #GRAPH.network('g0')
-        #GRAPH.cpu('g1')
         #GRAPH.load('g2')
         #GRAPH.memory('g3')
         #GRAPH.hdtemp(config.getlist('Hd', 'hds'), 'g4')

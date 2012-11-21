@@ -10,12 +10,14 @@ isn't used because monitor polling is done each 5 minutes.
 import re
 
 from ..monitor import Monitor, MONITOR
+from ..graph import Graph, GRAPH
 from ..rrd import Rrd
 
+_NAME = 'network'
 
 class _NetMonitor(Monitor):
     def __init__(self, config):
-        super(_NetMonitor, self).__init__(config, 'network')
+        super(_NetMonitor, self).__init__(config, _NAME)
 
         if config.has_options('Network', [ 'ifaces', 'max_lan' ]):
             self._ifaces = config.getlist('Network', 'ifaces')
@@ -58,4 +60,19 @@ class _NetMonitor(Monitor):
             i = i + 2
 
 
-MONITOR['network'] = _NetMonitor
+class _NetGraph(Graph):
+    def __init__(self, config):
+        super(_NetGraph, self).__init__(config, _NAME, _NAME)
+
+    def graph(self, width=0, height=0, view=''):
+        super(_NetGraph, self).graph(width, height, view)
+
+        g = self._build_graph('Bytes')
+        defs = g.defs([ 'eth0_rx', 'eth0_tx' ])
+        g.area(defs[0], '#00c000', 'Network rx')
+        g.line(defs[1], '#0000c0', 'Network tx')
+        g.do_graph()
+
+
+MONITOR[_NAME] = _NetMonitor
+GRAPH[_NAME]   = _NetGraph

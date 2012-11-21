@@ -103,9 +103,9 @@ class _GraphBuilder:
                              vertical_label=self._label)
         rrd_graph.data.extend(self._data)
         if self._size[0] > 0:
-            rrd_graph.width = size[0]
+            rrd_graph.width = self._size[0]
         if self._size[1] > 0:
-            rrd_graph.height = size[1]
+            rrd_graph.height = self._size[1]
         #rrd_graph.write(debug=True)
         rrd_graph.write()
 
@@ -131,7 +131,7 @@ class Graph(object):
         ''' Set graph size '''
         size = [ self._width, self._height ]
         if width > 0:
-            size[0] = width, 
+            size[0] = width
         if height > 0:
             size[1] = height
         self._size = tuple(size) 
