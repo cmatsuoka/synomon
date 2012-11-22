@@ -105,7 +105,7 @@ class Graph(object):
         self._set_size(width, height)
         self._view = view
         if view != '':
-            view = '-' + view 
+            view = '_' + view 
         self._filename = self._dest_dir + '/' + self._gname + view + '.png'
 
 
