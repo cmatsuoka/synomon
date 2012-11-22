@@ -75,14 +75,14 @@
 <p>
 <div class="twocolumn">
 <?php
-  image('Router',       'tplink', $range);
+  image('Router',       'tplink',  $range);
   image('NAS network',  'network', $range);
-  image('CPU stats',    'cpu', $range);
-  image('CPU load',     'load', $range);
-  image('Memory usage', 'memory', $range);
-  image('Disk temperature', 'hdtemp', $range);
-  image('Disk I/O', 'g5', $range);
-  image('Volume usage', 'g7', $range);
+  image('CPU stats',    'cpu',     $range);
+  image('CPU load',     'load',    $range);
+  image('Memory usage', 'memory',  $range);
+  image('Disk temperature', 'hd.temp', $range);
+  image('Disk I/O',     'hdio',    $range);
+  image('Volume usage', 'volumes', $range);
 ?>
 </div>
 
