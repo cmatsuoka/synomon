@@ -65,15 +65,6 @@ class _VolMonitor(Monitor):
             i = i + 2
 
 
-    def volume(self, vols):
-        ''' Create volume usage graph elements '''
-        def1 = [ ]
-        def2 = [ ]
-        cdef = [ ]
-        line = [ ]
-        i = 0
-
-
 class _VolGraph(Graph):
     def __init__(self, config):
         super(_VolGraph, self).__init__(config, _NAME, _NAME)
