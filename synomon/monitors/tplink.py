@@ -33,9 +33,11 @@ class _TplinkMonitor(Monitor):
         try:
             cmd = self._run_command('curl -s --user ' + userdef + ' http://' +
                                     self._host + '/userRpm/StatusRpm.htm')
-            m = re.search(r'var statistList = new Array\(\n(\d+), (\d+)', cmd)
+            m = self._search(r'var statistList = new Array\(\n(\d+), (\d+)',
+                             cmd)
             self._data = tuple(map(int, m.group(1, 2)))
-        except:
+        except Exception, err:
+            print '%s: %s\n' % (self.__class__.__name__, str(err))
             self._data = 0, 0
 
     def _create(self):

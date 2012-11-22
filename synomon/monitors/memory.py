@@ -22,7 +22,8 @@ class _MemMonitor(Monitor):
         try:
             with open('/proc/meminfo') as f:
                 cmd = f.read()
-        except:
+        except Exception, err:
+            print '%s: %s\n' % (self.__class__.__name__, str(err))
             cmd = None
 
         t = ()

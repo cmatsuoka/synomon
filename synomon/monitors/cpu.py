@@ -23,7 +23,8 @@ class _CpuMonitor(Monitor):
                 m = self._search('cpu\s+(\d+) (\d+) (\d+) (\d+) (\d+) ' +
                                  '(\d+) (\d+)', f.readline())
                 self._data = tuple(map(int, m.group(1, 2, 3, 4, 5, 6, 7)))
-        except:
+        except Exception, err:
+            print '%s: %s\n' % (self.__class__.__name__, str(err))
             self._data = 0, 0, 0, 0, 0, 0, 0
 
     def _create(self):

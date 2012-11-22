@@ -22,7 +22,8 @@ class _UptimeMonitor(Monitor):
             with open("/proc/uptime") as f:
                 m = self._search("^([\d]+)\.\d+ ([\d]+)\.", f.read())
                 self._data = tuple(map(int, m.group(1, 2)))
-        except:
+        except Exception, err:
+            print '%s: %s\n' % (self.__class__.__name__, str(err))
             self._data = 0, 0
 
     def _create(self):
