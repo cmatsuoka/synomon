@@ -44,29 +44,6 @@ class _GraphBuilder:
         area1 = AREA(defObj=defobj, color=color, legend=legend, stack=stack) 
         self._data = self._data + [ area1 ]
 
-    def volume(self, vols):
-        ''' Create volume usage graph elements '''
-        def1 = [ ]
-        def2 = [ ]
-        cdef = [ ]
-        line = [ ]
-        i = 0
-
-        for vol in vols:
-            name_total = 'vol%d_total' % (i)
-            name_used  = 'vol%d_used' % (i)
-
-            def1.append(self._def(vname='v%dt' % (i), dsname=name_total))
-            def2.append(self._def(vname='v%du' % (i), dsname=name_used))
-            cdef.append(CDEF(vname='v%dp' % (i),
-                             rpn='v%du,100,*,v%dt,/' % (i, i)))
-            line.append(LINE(defObj=cdef[i], color=COLOR1[i], width=2,
-                             legend=vol[0]))
-
-            self._data = self._data + [ def1[i], def2[i], cdef[i], line[i] ]
-
-            i = i + 1
-
     def do_graph(self):
         ''' Create the graph image file '''
         if self._filename == '':
@@ -91,6 +68,7 @@ class _GraphBuilder:
             rrd_graph.height = self._size[1]
         #rrd_graph.write(debug=True)
         rrd_graph.write()
+
 
 class Graph(object):
     ''' Create graphs for data stored in RRDs '''
@@ -119,6 +97,10 @@ class Graph(object):
             size[1] = height
         self._size = tuple(size) 
 
+    def _build_graph(self, label):
+        return _GraphBuilder(self._rrd_name, self._filename, label,
+                             self._size, self._view)
+
     def graph(self, width, height, view):
         self._set_size(width, height)
         self._view = view
@@ -126,17 +108,6 @@ class Graph(object):
             view = '-' + view 
         self._filename = self._dest_dir + '/' + self._gname + view + '.png'
 
-    def _build_graph(self, label):
-        return _GraphBuilder(self._rrd_name, self._filename, label,
-                             self._size, self._view)
-
-    def volume(self, vols, filename, width=0, height=0, view=''):
-        ''' Volume usage graph '''
-        self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/volumes.rrd')
-        graph.volume(vols)
-        graph.do_graph(self._filename, 'Percent', self._view, self._size)
 
 GRAPH = { }
 

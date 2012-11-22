@@ -65,4 +65,35 @@ class _VolMonitor(Monitor):
             i = i + 2
 
 
+    def volume(self, vols):
+        ''' Create volume usage graph elements '''
+        def1 = [ ]
+        def2 = [ ]
+        cdef = [ ]
+        line = [ ]
+        i = 0
+
+
+class _VolGraph(Graph):
+    def __init__(self, config):
+        super(_VolGraph, self).__init__(config, _NAME, _NAME)
+
+    def graph(self, width=0, height=0, view=''):
+        super(_VolGraph, self).graph(width, height, view)
+
+        vols = self._config.items('VolumeList')
+
+        g = self._build_graph('Percentage')
+        i = 0
+        for vol in vols:
+            total = 'vol%d_total' % (i)
+            used  = 'vol%d_used' % (i)
+            g.defs([ total, used ])
+            cdef = g.cdef('v%dp' % (i), '%s,100,*,%s,/' % (total, used))
+            g.line(cdef, self._color1[i], vol[0], width=2)
+            i = i + 1
+        g.do_graph()
+
+
 MONITOR[_NAME] = _VolMonitor
+GRAPH[_NAME]   = _VolGraph
