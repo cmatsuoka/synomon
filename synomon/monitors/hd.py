@@ -72,7 +72,7 @@ class _HDMonitor(Monitor):
 
 class _HDTempGraph(Graph):
     def __init__(self, config):
-        super(_HDTempGraph, self).__init__(config, _NAME, 'hdtemp')
+        super(_HDTempGraph, self).__init__(config, _NAME, _NAME + '.temp')
 
     def graph(self, width=0, height=0, view=''):
         super(_HDTempGraph, self).graph(width, height, view)
@@ -91,5 +91,5 @@ class _HDTempGraph(Graph):
         g.do_graph()
 
 
-MONITOR[_NAME]  = _HDMonitor
-GRAPH['hdtemp'] = _HDTempGraph
+MONITOR[_NAME]         = _HDMonitor
+GRAPH[_NAME + '.temp'] = _HDTempGraph

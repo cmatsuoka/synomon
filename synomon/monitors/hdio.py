@@ -69,4 +69,42 @@ class _IOMonitor(Monitor):
             i = i + 4
 
 
-MONITOR[_NAME] = _IOMonitor
+class _IOGraph(Graph):
+    def __init__(self, config):
+        super(_IOGraph, self).__init__(config, _NAME, _NAME)
+
+    def graph(self, width=0, height=0, view=''):
+        super(_IOGraph, self).graph(width, height, view)
+
+        hds = self._config.getlist('Hd', 'hds')
+
+        g = self._build_graph('Sectors')
+        for i in range(len(hds)):
+            g.line(g.ddef('hd%d_reads'  % (i)), self._color1[i],
+                          'HD%d reads'  % (i + 1))
+            g.line(g.ddef('hd%d_writes' % (i)), self._color2[i],
+                          'HD%d writes' % (i + 1))
+        g.do_graph()
+
+
+class _TimeGraph(Graph):
+    def __init__(self, config):
+        super(_TimeGraph, self).__init__(config, _NAME, _NAME + '.time')
+
+    def graph(self, width=0, height=0, view=''):
+        super(_TimeGraph, self).graph(width, height, view)
+
+        hds = self._config.getlist('Hd', 'hds')
+
+        g = self._build_graph('Milliseconds')
+        for i in range(len(hds)):
+            g.line(g.ddef('hd%d_readtime'  % (i)), self._color1[i],
+                          'HD%d read'  % (i + 1))
+            g.line(g.ddef('hd%d_writetime' % (i)), self._color2[i],
+                          'HD%d write' % (i + 1))
+        g.do_graph()
+
+
+MONITOR[_NAME]         = _IOMonitor
+GRAPH[_NAME]           = _IOGraph
+GRAPH[_NAME + '.time'] = _TimeGraph

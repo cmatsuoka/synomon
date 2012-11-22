@@ -96,7 +96,7 @@ class Graph(object):
     ''' Create graphs for data stored in RRDs '''
 
     _color1 = [ '#c00000', '#00c000', '#0000c0', '#c0c000', '#c08000',
-           '#8000c0', '#00c0c0', '#c000c0', '#804000', '#408040' ]
+                '#8000c0', '#00c0c0', '#c000c0', '#804000', '#408040' ]
     _color2 = [ '#800080', '#008080', '#0080c0', '#00c080' ]
 
     def __init__(self, config, name, gname, width=0, height=0):
@@ -129,28 +129,6 @@ class Graph(object):
     def _build_graph(self, label):
         return _GraphBuilder(self._rrd_name, self._filename, label,
                              self._size, self._view)
-
-    def hdio(self, hds, filename, width=0, height=0, view=''):
-        ''' HD I/O graph '''
-        self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/hdio.rrd')
-        for i in range(len(hds)):
-            graph.line('hd%d_reads'  % (i), COLOR1[i], 'HD%d reads'  % (i + 1))
-            graph.line('hd%d_writes' % (i), COLOR2[i], 'HD%d writes' % (i + 1))
-        graph.do_graph(self._filename, 'Sectors', self._view, self._size)
-
-    def hdtime(self, hds, filename, width=0, height=0, view=''):
-        ''' HD I/O graph '''
-        self._set_size(width, height)
-        self._set_filename(filename, view)
-        graph = _GraphBuilder(self._path + '/hdio.rrd')
-        for i in range(len(hds)):
-            graph.line('hd%d_readtime'  % (i), COLOR1[i],
-                       'HD%d read'  % (i + 1))
-            graph.line('hd%d_writetime' % (i), COLOR2[i],
-                       'HD%d write' % (i + 1))
-        graph.do_graph(self._filename, 'Milliseconds', self._view, self._size)
 
     def volume(self, vols, filename, width=0, height=0, view=''):
         ''' Volume usage graph '''
