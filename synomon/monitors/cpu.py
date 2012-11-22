@@ -61,10 +61,14 @@ class _CpuGraph(Graph):
         cdef2 = g.cdef('pnice'  , '100,nice,*,all,/')
         cdef3 = g.cdef('psystem', '100,system,*,all,/')
         cdef4 = g.cdef('piowait', '100,iowait,*,all,/')
+        cdef5 = g.cdef('pirq',    '100,irq,*,all,/')
+        cdef6 = g.cdef('psoftirq','100,softirq,*,all,/')
         g.area(cdef1, '#00c000', 'User', True)
-        g.area(cdef2, '#c0c000', 'Nice', True)
+        g.area(cdef2, '#e0e000', 'Nice', True)
         g.area(cdef3, '#0000c0', 'System', True)
         g.area(cdef4, '#c00000', 'IOwait', True)
+        g.area(cdef5, '#8080f0', 'IRQ', True)
+        g.area(cdef6, '#f040f0', 'SoftIRQ', True)
         g.do_graph()
 
 
