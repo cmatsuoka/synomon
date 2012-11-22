@@ -66,7 +66,7 @@ class _NetGraph(Graph):
     def graph(self, width=0, height=0, view=''):
         super(_NetGraph, self).graph(width, height, view)
 
-        g = self._build_graph('Bytes')
+        g = self._build_graph('Kbytes')
         defs = g.defs([ 'eth0_rx', 'eth0_tx' ])
         g.area(defs[0], '#00c000', 'Network rx')
         g.line(defs[1], '#0000c0', 'Network tx')
