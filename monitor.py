@@ -23,10 +23,21 @@ if __name__ == '__main__':
     config = synomon.config.Config()
 
     if len(sys.argv) < 2:
-        print "Usage: %s [ show | update | report ]" % (sys.argv[0])
+        print "Usage: %s [ list | show | update | report ]" % (sys.argv[0])
         sys.exit(0)
 
-    if sys.argv[1] == 'show':
+    if sys.argv[1] == 'list':
+        print 'Available monitors and graphs:'
+        gm = synomon.graph.all()
+            
+        for i in sorted(synomon.monitor.all()):
+            sys.stdout.write('  %-10.10s: ' % (i))
+            if (i in gm):
+                print ', '.join(sorted(gm[i]))
+            else:
+                print '(no graphs defined)'
+
+    elif sys.argv[1] == 'show':
         for i in synomon.monitor.monitors(config):
             i.show()
 

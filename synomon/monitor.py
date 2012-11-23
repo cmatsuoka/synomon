@@ -44,9 +44,9 @@ class Monitor(object):
 
 MONITOR = { }
 
-def monitors(config):
-    if not config.has_option('Global', 'monitors'):
-        config._create_file()
+def all():
+    return MONITOR.keys()
 
+def monitors(config):
     return [ MONITOR[i](config) for i in config.getlist('Global', 'monitors') ]
 

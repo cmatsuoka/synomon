@@ -6,6 +6,8 @@ Graph building class
 This class encapsulates pyrrd graph building calls.
 '''
 
+import synomon.config
+from collections import defaultdict
 from pyrrd.graph import DEF, CDEF, LINE, AREA
 from pyrrd.graph import Graph as RRDGraph
 
@@ -101,6 +103,12 @@ class Graph(object):
         return _GraphBuilder(self._rrd_name, self._filename, label,
                              self._size, self._view)
 
+    def monitor(self):
+        return self._name
+
+    def name(self):
+        return self._gname
+
     def graph(self, width, height, view):
         self._set_size(width, height)
         self._view = view
@@ -110,6 +118,13 @@ class Graph(object):
 
 
 GRAPH = { }
+
+def all():
+    config = synomon.config.Config()
+    gm = defaultdict(list)
+    for i in [ GRAPH[i](config) for i in GRAPH.keys() ]:
+        gm[i.monitor()].append(i.name())
+    return gm
 
 def graphs(config):
     return [ GRAPH[i](config) for i in config.getlist('Global', 'graphs') ]
