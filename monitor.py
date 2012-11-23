@@ -45,14 +45,6 @@ if __name__ == '__main__':
         for i in synomon.graph.graphs(config):
             i.graph(height=150, width=480, view=view)
 
-        #GRAPH = Graph(config, height=150, width=480, view=view)
-        #GRAPH.load('g2')
-        #GRAPH.memory('g3')
-        #GRAPH.hdtemp(config.getlist('Hd', 'hds'), 'g4')
-        #GRAPH.hdio(config.getlist('Hd', 'hds'), 'g5')
-        ##GRAPH.hdtime(config.get_list('Disk', 'hds', 'g6')
-        #GRAPH.volume(config.items('VolumeList'), 'g7')
-        
     else:
         print "Invalid command %s" % (sys.argv[1])
         sys.exit(1)
