@@ -23,6 +23,8 @@ class Config:
            self._config.set('Global', 'dest_dir', '/volume1/web/stats/')
            self._config.set('Global', 'monitors',
                             'uptime,cpu,load,memory,volumes,hd,hdio,network')
+           self._config.set('Global', 'graphs',
+                            'cpu,load,memory,volumes,hd.temp,hdio,network')
         else:
             self._config.read(self._file)
 
