@@ -70,4 +70,4 @@ class _TplinkGraph(Graph):
 
 
 MONITOR[_NAME] = _TplinkMonitor
-GRAPH[_NAME]   = _TplinkGraph
+GRAPH[_NAME]   = _TplinkGraph, _NAME

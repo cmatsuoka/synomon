@@ -120,11 +120,10 @@ class Graph(object):
 GRAPH = { }
 
 def all():
-    config = synomon.config.Config()
     gm = defaultdict(list)
-    for i in [ GRAPH[i](config) for i in GRAPH.keys() ]:
-        gm[i.monitor()].append(i.name())
+    for i in GRAPH.keys():
+        gm[GRAPH[i][1]].append(i)
     return gm
 
 def graphs(config):
-    return [ GRAPH[i](config) for i in config.getlist('Global', 'graphs') ]
+    return [ GRAPH[i][0](config) for i in config.getlist('Global', 'graphs') ]

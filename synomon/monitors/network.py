@@ -74,4 +74,4 @@ class _NetGraph(Graph):
 
 
 MONITOR[_NAME] = _NetMonitor
-GRAPH[_NAME]   = _NetGraph
+GRAPH[_NAME]   = _NetGraph, _NAME

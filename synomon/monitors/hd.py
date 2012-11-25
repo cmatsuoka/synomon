@@ -92,4 +92,4 @@ class _HDTempGraph(Graph):
 
 
 MONITOR[_NAME]         = _HDMonitor
-GRAPH[_NAME + '.temp'] = _HDTempGraph
+GRAPH[_NAME + '.temp'] = _HDTempGraph, _NAME

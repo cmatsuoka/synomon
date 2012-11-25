@@ -11,16 +11,15 @@ class Config:
     Locate, open and read configuration file options, creates a template
     if no configuration file is found (default is /opt/etc/monitor.conf)
     """
-    def __init__(self):
-        self._file = os.path.join('/opt/etc/monitor.conf')
-
+    def __init__(self, configfile):
+        self._file = configfile
         self._config = ConfigParser.ConfigParser()
 
         if not os.path.isfile(self._file):
-           config.add_section('Global')
-           config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
-           config.set('Global', 'dest_dir', '/volume1/web/stats/')
-           config.set('Global', 'monitors', 'uptime,stat,load,memory,volume,hd,io,network')
+           self._config.add_section('Global')
+           self._config.set('Global', 'rrd_dir', '/opt/var/lib/monitor')
+           self._config.set('Global', 'dest_dir', '/volume1/web/stats/')
+           self._config.set('Global', 'monitors', 'uptime,stat,load,memory,volume,hd,io,network')
         else:
             self._config.read(self._file)
 

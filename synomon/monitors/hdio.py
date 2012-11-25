@@ -106,5 +106,5 @@ class _TimeGraph(Graph):
 
 
 MONITOR[_NAME]         = _IOMonitor
-GRAPH[_NAME]           = _IOGraph
-GRAPH[_NAME + '.time'] = _TimeGraph
+GRAPH[_NAME]           = _IOGraph, _NAME
+GRAPH[_NAME + '.time'] = _TimeGraph, _NAME

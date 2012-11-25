@@ -10,53 +10,65 @@ or hard disks reserve space for them in the CONF_MAX_* variables.
 '''
 
 import sys
-
-from synomon.graph import Graph
-
+import argparse
 import synomon.config
 import synomon.monitor
 from synomon.monitors import *
 
+def cmd_list(args):
+    print 'Available monitors and graphs:'
+    gm = synomon.graph.all()
+            
+    for i in sorted(synomon.monitor.all()):
+        sys.stdout.write('  %-10.10s: ' % (i))
+        if (i in gm):
+            print ', '.join(sorted(gm[i]))
+        else:
+            print '(no graphs defined)'
+
+def cmd_show(args):
+    config = synomon.config.Config(args.config_file)
+    for i in synomon.monitor.monitors(config):
+        i.show()
+
+def cmd_update(args):
+    config = synomon.config.Config(args.config_file)
+    for i in synomon.monitor.monitors(config):
+        i.update()
+
+def cmd_report(args):
+    config = synomon.config.Config(args.config_file)
+
+    print 'Generating report...'
+    if len(sys.argv) > 2:
+        view = sys.argv[2]
+    else:
+        view = ''
+
+    for i in synomon.graph.graphs(config):
+        i.graph(height=150, width=480, view=view)
 
 if __name__ == '__main__':
 
-    config = synomon.config.Config()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--config-file', metavar='file',
+                  action='store', default='/opt/etc/monitor.conf',
+                  help='configuration file to use')
+    subparser = parser.add_subparsers()
+    list_parser = subparser.add_parser('list',
+                  help='list all available monitors and graphs')
+    list_parser.set_defaults(func=cmd_list)
+    show_parser = subparser.add_parser('show',
+                  help='show values retrieved by monitors')
+    show_parser.set_defaults(func=cmd_show)
+    update_parser = subparser.add_parser('update', help='update database')
+    update_parser.set_defaults(func=cmd_update)
+    report_parser = subparser.add_parser('report', help='generate graphs')
+    report_parser.set_defaults(func=cmd_report)
 
-    if len(sys.argv) < 2:
-        print "Usage: %s [ list | show | update | report ]" % (sys.argv[0])
-        sys.exit(0)
+    args = parser.parse_args()
+    args.func(args)
 
-    if sys.argv[1] == 'list':
-        print 'Available monitors and graphs:'
-        gm = synomon.graph.all()
-            
-        for i in sorted(synomon.monitor.all()):
-            sys.stdout.write('  %-10.10s: ' % (i))
-            if (i in gm):
-                print ', '.join(sorted(gm[i]))
-            else:
-                print '(no graphs defined)'
 
-    elif sys.argv[1] == 'show':
-        for i in synomon.monitor.monitors(config):
-            i.show()
 
-    elif sys.argv[1] == 'update':
-        for i in synomon.monitor.monitors(config):
-            i.update()
-
-    elif sys.argv[1] == 'report':
-        print 'Generating report...'
-
-        if len(sys.argv) > 2:
-            view = sys.argv[2]
-        else:
-            view = ''
-
-        for i in synomon.graph.graphs(config):
-            i.graph(height=150, width=480, view=view)
-
-    else:
-        print "Invalid command %s" % (sys.argv[1])
-        sys.exit(1)
 

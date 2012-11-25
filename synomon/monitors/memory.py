@@ -78,4 +78,4 @@ class _MemGraph(Graph):
 
 
 MONITOR[_NAME] = _MemMonitor
-GRAPH[_NAME]   = _MemGraph
+GRAPH[_NAME]   = _MemGraph, _NAME

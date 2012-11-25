@@ -56,4 +56,4 @@ class _LoadGraph(Graph):
 
 
 MONITOR[_NAME] = _LoadMonitor
-GRAPH[_NAME]   = _LoadGraph
+GRAPH[_NAME]   = _LoadGraph, _NAME

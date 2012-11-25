@@ -73,4 +73,4 @@ class _CpuGraph(Graph):
 
 
 MONITOR[_NAME] = _CpuMonitor
-GRAPH[_NAME]   = _CpuGraph
+GRAPH[_NAME]   = _CpuGraph, _NAME

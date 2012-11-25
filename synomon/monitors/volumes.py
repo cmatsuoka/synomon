@@ -87,4 +87,4 @@ class _VolGraph(Graph):
 
 
 MONITOR[_NAME] = _VolMonitor
-GRAPH[_NAME]   = _VolGraph
+GRAPH[_NAME]   = _VolGraph, _NAME
