@@ -23,7 +23,7 @@ class _IOMonitor(Monitor):
             self._max_hds = config.getint('Hd', 'max_hds')
         else:
             config.add_option('Hd', 'hds', 'sda,sdb')
-            config.add_option('Hd', 'max_hds', 2)
+            config.add_option('Hd', 'max_hds', '2')
 
     def _parse(self):
         cmd = { }

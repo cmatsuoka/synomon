@@ -48,5 +48,8 @@ def all():
     return MONITOR.keys()
 
 def monitors(config):
-    return [ MONITOR[i](config) for i in config.getlist('Global', 'monitors') ]
+    ret = [ MONITOR[i](config) for i in config.getlist('Global', 'monitors') ]
+    if config.changed():
+        config.write()
+    return ret
 

@@ -25,7 +25,6 @@ class _NetMonitor(Monitor):
             config.add_option('Network', 'ifaces', 'eth0')
             config.add_option('Network', 'max_lan', 1)
 
-
     def _parse(self):
         cmd = { }
         for i in self._ifaces:
