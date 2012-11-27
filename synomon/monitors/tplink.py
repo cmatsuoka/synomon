@@ -59,7 +59,7 @@ class _TplinkGraph(Graph):
     def __init__(self, config):
         super(_TplinkGraph, self).__init__(config, _NAME, _NAME)
 
-    def graph(self, width=0, height=0, view=''):
+    def graph(self, width=0, height=0, view=None):
         super(_TplinkGraph, self).graph(width, height, view)
 
         g = self._build_graph('Bytes')

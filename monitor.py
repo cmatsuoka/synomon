@@ -38,11 +38,8 @@ def cmd_update(args):
 
 def cmd_report(args):
     config = synomon.config.Config(args.config_file)
-
     print 'Generating report...'
-    print args
     view = args.range;
-
     for i in synomon.graph.graphs(config):
         i.graph(height=150, width=480, view=view)
 
@@ -76,7 +73,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     args.func(args)
-
-
-
 

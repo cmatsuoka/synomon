@@ -109,10 +109,12 @@ class Graph(object):
     def name(self):
         return self._gname
 
-    def graph(self, width, height, view):
+    def graph(self, width, height, view=None):
         self._set_size(width, height)
         self._view = view
-        if view != '':
+        if view == None:
+            view = ''
+        else:
             view = '_' + view 
         self._filename = self._dest_dir + '/' + self._gname + view + '.png'
 
