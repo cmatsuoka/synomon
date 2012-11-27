@@ -41,6 +41,9 @@
 
 <?php
   function image($title, $name, $range) {
+    if ($range != '') {
+        $range = '_' . $range;
+    }
     echo '<div class="graph">';
     echo ' <h3>' . $title . '</h3>';
     echo ' <img src="' . $name . $range . '.png">';

@@ -40,10 +40,8 @@ def cmd_report(args):
     config = synomon.config.Config(args.config_file)
 
     print 'Generating report...'
-    if len(sys.argv) > 2:
-        view = sys.argv[2]
-    else:
-        view = ''
+    print args
+    view = args.range;
 
     for i in synomon.graph.graphs(config):
         i.graph(height=150, width=480, view=view)
@@ -52,18 +50,28 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--config-file', metavar='file',
-                  action='store', default='/opt/etc/monitor.conf',
+                  default='/opt/etc/monitor.conf',
                   help='configuration file to use')
     subparser = parser.add_subparsers()
+
     list_parser = subparser.add_parser('list',
                   help='list all available monitors and graphs')
     list_parser.set_defaults(func=cmd_list)
+
     show_parser = subparser.add_parser('show',
                   help='show values retrieved by monitors')
     show_parser.set_defaults(func=cmd_show)
+
     update_parser = subparser.add_parser('update', help='update database')
     update_parser.set_defaults(func=cmd_update)
+
     report_parser = subparser.add_parser('report', help='generate graphs')
+    report_parser.add_argument('-w', '--weekly', dest='range', const='w',
+                  action='store_const', help='weekly graph')
+    report_parser.add_argument('-m', '--monthly', dest='range', const='m',
+                  action='store_const', help='monthly graph')
+    report_parser.add_argument('-y', '--yearly', dest='range', const='y',
+                  action='store_const', help='yearly graph')
     report_parser.set_defaults(func=cmd_report)
 
     args = parser.parse_args()
