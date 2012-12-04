@@ -80,9 +80,9 @@ class _IOGraph(Graph):
 
         g = self._build_graph('Sectors')
         for i in range(len(hds)):
-            g.line(g.ddef('hd%d_reads'  % (i)), self._color1[i],
+            g.line(g.ddef('hd%d_reads'  % (i)), self._get_color(i * 2),
                           'HD%d reads'  % (i + 1))
-            g.line(g.ddef('hd%d_writes' % (i)), self._color2[i],
+            g.line(g.ddef('hd%d_writes' % (i)), self._get_color(i * 2 + 1),
                           'HD%d writes' % (i + 1))
         g.do_graph()
 
@@ -98,9 +98,9 @@ class _TimeGraph(Graph):
 
         g = self._build_graph('Milliseconds')
         for i in range(len(hds)):
-            g.line(g.ddef('hd%d_readtime'  % (i)), self._color1[i],
+            g.line(g.ddef('hd%d_readtime'  % (i)), self._get_color(i * 2),
                           'HD%d read'  % (i + 1))
-            g.line(g.ddef('hd%d_writetime' % (i)), self._color2[i],
+            g.line(g.ddef('hd%d_writetime' % (i)), self._get_color(i * 2 + 1),
                           'HD%d write' % (i + 1))
         g.do_graph()
 

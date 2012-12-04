@@ -81,7 +81,7 @@ class _VolGraph(Graph):
             used  = 'vol%d_used' % (i)
             g.defs([ total, used ])
             cdef = g.cdef('v%dp' % (i), '%s,100,*,%s,/' % (used, total))
-            g.line(cdef, self._color1[i], vol[0], width=2)
+            g.line(cdef, self._get_color(i), vol[0], width=2)
             i = i + 1
         g.do_graph()
 

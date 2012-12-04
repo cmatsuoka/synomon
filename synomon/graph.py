@@ -78,7 +78,6 @@ class Graph(object):
 
     _color1 = [ '#c00000', '#00c000', '#0000c0', '#c0c000', '#c08000',
                 '#8000c0', '#00c0c0', '#c000c0', '#804000', '#408040' ]
-    _color2 = [ '#800080', '#008080', '#0080c0', '#00c080' ]
 
     def __init__(self, config, name, gname, width=0, height=0):
         self._config = config
@@ -90,6 +89,10 @@ class Graph(object):
         self._rrd_name = config.get('Global', 'rrd_dir') + '/' + name + '.rrd'
         self._view = ''
         self._size = ()
+
+    def _get_color(self, index):
+        i = index % len(self._color1)
+        return self._color1[i]
     
     def _build_graph(self, label):
         return _GraphBuilder(self._rrd_name, self._filename, label,

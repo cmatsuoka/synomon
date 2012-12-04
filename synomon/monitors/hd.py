@@ -84,9 +84,9 @@ class _HDTempGraph(Graph):
         for i in range(len(hds)):
             name = "hd%d_temp" % (i)
             legend =  "HD%d temperature" % (i + 1)
-            g.line(g.ddef(name), self._color1[i] + '40', '')
+            g.line(g.ddef(name), self._get_color(i) + '40', '')
             cdef1 = g.cdef(name + '_t', '%s,3000,TREND' % (name))
-            g.line(cdef1, self._color1[i], legend, 2)
+            g.line(cdef1, self._get_color(i), legend, 2)
 
         g.do_graph()
 
