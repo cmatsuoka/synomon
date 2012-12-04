@@ -89,15 +89,38 @@ class Graph(object):
         self._rrd_name = config.get('Global', 'rrd_dir') + '/' + name + '.rrd'
         self._view = ''
         self._size = ()
+        self._colors = self._color1
 
-    def _get_color(self, index):
-        i = index % len(self._color1)
-        return self._color1[i]
+    def _get_config_colors(self, section):
+        colors = self._config.getlist(section, 'colors')
+        return [ '#' + i for i in colors ]
+
+    def _set_config_colors(self, colors):
+        clist = []
+        for c in colors:
+            if c[0] == '#':
+                clist.append(c[1:])
+            else:
+                clist.append(c)
+
+        section = 'Graph.' + self._gname
+        if not self._config.has_option(section, 'colors'):
+            self._config.add_option(section, 'colors', ','.join(clist))
     
     def _build_graph(self, label):
+
+        # Set colors
+        section = 'Graph.' + self._gname
+        if self._config.has_option(section, 'colors'):
+            self._colors = self._get_config_colors(section)
+
         return _GraphBuilder(self._rrd_name, self._filename, label,
                              self._width, self._height, self._view)
 
+    def _get_color(self, index):
+        i = index % len(self._colors)
+        return self._colors[i]
+    
     def monitor(self):
         return self._name
 
@@ -144,4 +167,7 @@ def all():
     return gm
 
 def graphs(config):
-    return [ GRAPH[i][0](config) for i in config.getlist('Global', 'graphs') ]
+    ret = [ GRAPH[i][0](config) for i in config.getlist('Global', 'graphs') ]
+    if config.changed():
+        config.write(warn=False)
+    return ret

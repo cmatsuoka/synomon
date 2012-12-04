@@ -28,9 +28,6 @@ class Config:
            self._config.add_section('Graph')
            self._config.set('Graph', 'width', '480')
            self._config.set('Graph', 'height', '150')
-           self._config.add_section('Graph.<name>')
-           self._config.set('Graph.<name>', 'width', '480')
-           self._config.set('Graph.<name>', 'height', '150')
         else:
            self._config.read(self._file)
 
@@ -98,10 +95,11 @@ class Config:
     def _create_file(self):
         """Internal function to create a dummy config file if none is found"""
 
-    def write(self):
+    def write(self, warn=True):
         with open(self._file, 'w') as configfile:
             self._config.write(configfile)
 
-        print '\nPlease edit the configuration file %s\n' % (self._file)
-        sys.exit()
+        if warn:
+            print '\nPlease edit the configuration file %s\n' % (self._file)
+            sys.exit()
 

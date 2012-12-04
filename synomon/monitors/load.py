@@ -44,14 +44,15 @@ class _LoadMonitor(Monitor):
 class _LoadGraph(Graph):
     def __init__(self, config):
         super(_LoadGraph, self).__init__(config, _NAME, _NAME)
+        self._set_config_colors([ '#00c000', '#0000c0' ])
 
     def graph(self, width=0, height=0, view=''):
         super(_LoadGraph, self).graph(width, height, view)
 
         g = self._build_graph(r'Active\ tasks')
         defs = g.defs([ 'load_15', 'load_5' ])
-        g.area(defs[0], '#00c000', '15 min')
-        g.line(defs[1], '#0000c0', '5 min')
+        g.area(defs[0], self._get_color(0), '15 min')
+        g.line(defs[1], self._get_color(1), '5 min')
         g.do_graph()
 
 

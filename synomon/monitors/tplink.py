@@ -58,14 +58,15 @@ class _TplinkMonitor(Monitor):
 class _TplinkGraph(Graph):
     def __init__(self, config):
         super(_TplinkGraph, self).__init__(config, _NAME, _NAME)
+	self._set_config_colors([ '#00c000', '#0000c0' ])
 
     def graph(self, width=0, height=0, view=None):
         super(_TplinkGraph, self).graph(width, height, view)
 
         g = self._build_graph('Bytes')
         defs = g.defs([ 'rx', 'tx' ])
-        g.area(defs[0], '#00c000', 'Network rx')
-        g.line(defs[1], '#0000c0', 'Network tx')
+        g.area(defs[0], self._get_color(0), 'Network rx')
+        g.line(defs[1], self._get_color(1), 'Network tx')
         g.do_graph()
 
 

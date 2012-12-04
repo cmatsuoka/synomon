@@ -61,14 +61,15 @@ class _NetMonitor(Monitor):
 class _NetGraph(Graph):
     def __init__(self, config):
         super(_NetGraph, self).__init__(config, _NAME, _NAME)
+        self._set_config_colors([ '#00c000', '#0000c0' ])
 
     def graph(self, width=0, height=0, view=''):
         super(_NetGraph, self).graph(width, height, view)
 
         g = self._build_graph('Kbytes')
         defs = g.defs([ 'eth0_rx', 'eth0_tx' ])
-        g.area(defs[0], '#00c000', 'Network rx')
-        g.line(defs[1], '#0000c0', 'Network tx')
+        g.area(defs[0], self._get_color(0), 'Network rx')
+        g.line(defs[1], self._get_color(1), 'Network tx')
         g.do_graph()
 
 

@@ -61,6 +61,8 @@ class _MemMonitor(Monitor):
 class _MemGraph(Graph):
     def __init__(self, config):
         super(_MemGraph, self).__init__(config, _NAME, _NAME)
+        self._set_config_colors([ '#00c000', '#0000c0',
+                                  '#00c0c0c0', '#c00000' ])
 
     def graph(self, width=0, height=0, view=''):
         super(_MemGraph, self).graph(width, height, view)
@@ -68,12 +70,12 @@ class _MemGraph(Graph):
         g = self._build_graph('Bytes')
         defs = g.defs([ 'total', 'free', 'buffers', 'cached' ])
         cdef1 = g.cdef('used', 'total,free,-,buffers,-,cached,-')
-        g.area(cdef1, '#00c000', 'Used', stack=True)
-        g.area(defs[2], '#0000c0', 'Buffers', stack=True)
-        g.area(defs[3], '#00c0c0c0', 'Cached', stack=True)
+        g.area(cdef1, self._get_color(0), 'Used', stack=True)
+        g.area(defs[2], self._get_color(1), 'Buffers', stack=True)
+        g.area(defs[3], self._get_color(2), 'Cached', stack=True)
 	defs = g.defs([ 'swap_total', 'swap_free' ])
         cdef2 = g.cdef('swap', 'swap_total,swap_free,-')
-        g.line(cdef2, '#c00000', 'Swap')
+        g.line(cdef2, self._get_color(3), 'Swap')
         g.do_graph()
 
 

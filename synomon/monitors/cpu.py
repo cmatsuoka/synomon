@@ -50,6 +50,8 @@ class _CpuMonitor(Monitor):
 class _CpuGraph(Graph):
     def __init__(self, config):
         super(_CpuGraph, self).__init__(config, _NAME, _NAME)
+        self._set_config_colors([ '#00c000', '#e0e000', '#0000c0',
+                                  '#c00000', '#00c0c0', '#c0c0c0' ])
 
     def graph(self, width=0, height=0, view=''):
         super(_CpuGraph, self).graph(width, height, view)
@@ -63,12 +65,12 @@ class _CpuGraph(Graph):
         cdef4 = g.cdef('piowait', '100,iowait,*,all,/')
         cdef5 = g.cdef('pirq',    '100,irq,*,all,/')
         cdef6 = g.cdef('psoftirq','100,softirq,*,all,/')
-        g.area(cdef1, '#00c000', 'User', True)
-        g.area(cdef2, '#e0e000', 'Nice', True)
-        g.area(cdef3, '#0000c0', 'System', True)
-        g.area(cdef4, '#c00000', 'IOwait', True)
-        g.area(cdef5, '#8080f0', 'IRQ', True)
-        g.area(cdef6, '#f040f0', 'SoftIRQ', True)
+        g.area(cdef1, self._get_color(0), 'User', True)
+        g.area(cdef2, self._get_color(1), 'Nice', True)
+        g.area(cdef3, self._get_color(2), 'System', True)
+        g.area(cdef4, self._get_color(3), 'IOwait', True)
+        g.area(cdef5, self._get_color(4), 'IRQ', True)
+        g.area(cdef6, self._get_color(5), 'SoftIRQ', True)
         g.do_graph()
 
 

@@ -72,6 +72,7 @@ class _IOMonitor(Monitor):
 class _IOGraph(Graph):
     def __init__(self, config):
         super(_IOGraph, self).__init__(config, _NAME, _NAME)
+        self._set_config_colors([ '#c00000', '#00c000', '#800080', '#008080' ])
 
     def graph(self, width=0, height=0, view=''):
         super(_IOGraph, self).graph(width, height, view)
@@ -90,6 +91,7 @@ class _IOGraph(Graph):
 class _TimeGraph(Graph):
     def __init__(self, config):
         super(_TimeGraph, self).__init__(config, _NAME, _NAME + '.time')
+        self._set_config_colors([ '#c00000', '#00c000', '#800080', '#008080' ])
 
     def graph(self, width=0, height=0, view=''):
         super(_TimeGraph, self).graph(width, height, view)
