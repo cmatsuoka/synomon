@@ -24,9 +24,9 @@ class _TplinkMonitor(Monitor):
             self._user = config.get('Tplink', 'user')
             self._password = config.get('Tplink', 'password')
         else:
-            config.add_option('Txplink', 'host', '192.168.1.1.')
-            config.add_option('Txplink', 'user', 'admin')
-            config.add_option('Txplink', 'password', 'password')
+            config.add_option('Tplink', 'host', '192.168.1.1.')
+            config.add_option('Tplink', 'user', 'admin')
+            config.add_option('Tplink', 'password', 'password')
 
     def _parse(self):
         userdef = '%s:%s' % (self._user, self._password)
