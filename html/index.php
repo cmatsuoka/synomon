@@ -72,6 +72,11 @@
   }
   echo "</h2>";
 
+  echo '[ <a href="?r=d">Daily</a> ] ';
+  echo '[ <a href="?r=w">Weekly</a> ] ';
+  echo '[ <a href="?r=m">Monthly</a> ] ';
+  echo '[ <a href="?r=y">Yearly</a> ]';
+
   if ($range != '')
     $parm = " -$range";
 
