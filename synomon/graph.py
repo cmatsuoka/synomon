@@ -14,12 +14,13 @@ from pyrrd.graph import Graph as RRDGraph
 
 class _GraphBuilder:
     ''' Helpers to build a RRDtool graph using pyrrd calls '''
-    def __init__(self, rrd_file, filename, label, size, view):
+    def __init__(self, rrd_file, filename, label, width, height, view):
         self._data = []
         self._rrd_file = rrd_file
         self._filename = filename
         self._label = label
-        self._size = size
+        self._width = width
+        self._height = height
         self._view = view
 
     def ddef(self, name):
@@ -64,10 +65,10 @@ class _GraphBuilder:
         rrd_graph = RRDGraph(self._filename, start=-start, end=-1,
                              vertical_label=self._label)
         rrd_graph.data.extend(self._data)
-        if self._size[0] > 0:
-            rrd_graph.width = self._size[0]
-        if self._size[1] > 0:
-            rrd_graph.height = self._size[1]
+        if self._width > 0:
+            rrd_graph.width = self._width
+        if self._height > 0:
+            rrd_graph.height = self._height
         #rrd_graph.write(debug=True)
         rrd_graph.write()
 
@@ -90,18 +91,9 @@ class Graph(object):
         self._view = ''
         self._size = ()
     
-    def _set_size(self, width, height):
-        ''' Set graph size '''
-        size = [ self._width, self._height ]
-        if width > 0:
-            size[0] = width
-        if height > 0:
-            size[1] = height
-        self._size = tuple(size) 
-
     def _build_graph(self, label):
         return _GraphBuilder(self._rrd_name, self._filename, label,
-                             self._size, self._view)
+                             self._width, self._height, self._view)
 
     def monitor(self):
         return self._name
@@ -109,9 +101,29 @@ class Graph(object):
     def name(self):
         return self._gname
 
-    def graph(self, width, height, view=None):
-        self._set_size(width, height)
-        self._view = view
+    def graph(self, width=0, height=0, view=None):
+        w = h = 0
+
+        # Set graph size
+        if self._config.has_option('Graph', 'width'):
+            w = self._config.getint('Graph', 'width')
+        if self._config.has_option('Graph', 'height'):
+            h = self._config.getint('Graph', 'height')
+
+        # Set specific graph size
+        section = 'Graph.' + self._gname
+        if self._config.has_option(section, 'width'):
+            w = self._config.getint(section, 'width')
+        if self._config.has_option(section, 'height'):
+            h = self._config.getint(section, 'height')
+
+        # Parameter has precedence
+        if width > 0: w = width
+        if height > 0 : h = height
+
+        self._width = w
+        self._height = h
+
         if view == None:
             view = ''
         else:

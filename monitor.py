@@ -15,7 +15,7 @@ import synomon.config
 import synomon.monitor
 from synomon.monitors import *
 
-def cmd_list(args):
+def cmd_list(args, config):
     print 'Available monitors and graphs:'
     gm = synomon.graph.all()
             
@@ -26,22 +26,19 @@ def cmd_list(args):
         else:
             print '(no graphs defined)'
 
-def cmd_show(args):
-    config = synomon.config.Config(args.config_file)
+def cmd_show(args, config):
     for i in synomon.monitor.monitors(config):
         i.show()
 
-def cmd_update(args):
-    config = synomon.config.Config(args.config_file)
+def cmd_update(args, config):
     for i in synomon.monitor.monitors(config):
         i.update()
 
-def cmd_report(args):
-    config = synomon.config.Config(args.config_file)
+def cmd_report(args, config):
     print 'Generating report...'
     view = args.range;
     for i in synomon.graph.graphs(config):
-        i.graph(height=150, width=480, view=view)
+        i.graph(view=view)
 
 if __name__ == '__main__':
 
@@ -72,5 +69,6 @@ if __name__ == '__main__':
     report_parser.set_defaults(func=cmd_report)
 
     args = parser.parse_args()
-    args.func(args)
 
+    config = synomon.config.Config(args.config_file)
+    args.func(args, config)

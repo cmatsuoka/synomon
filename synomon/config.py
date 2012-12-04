@@ -25,8 +25,14 @@ class Config:
                             'uptime,cpu,load,memory,volumes,hd,hdio,network')
            self._config.set('Global', 'graphs',
                             'cpu,load,memory,volumes,hd.temp,hdio,network')
+           self._config.add_section('Graph')
+           self._config.set('Graph', 'width', '480')
+           self._config.set('Graph', 'height', '150')
+           self._config.add_section('Graph.<name>')
+           self._config.set('Graph.<name>', 'width', '480')
+           self._config.set('Graph.<name>', 'height', '150')
         else:
-            self._config.read(self._file)
+           self._config.read(self._file)
 
         self._sections = set(self._config.sections())
 	self._options = defaultdict(set)
