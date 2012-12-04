@@ -123,6 +123,7 @@ class Graph(object):
 
         self._width = w
         self._height = h
+        self._view = view
 
         if view == None:
             view = ''

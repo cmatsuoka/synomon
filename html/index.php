@@ -41,9 +41,8 @@
 
 <?php
   function image($title, $name, $range) {
-    if ($range != '') {
+    if ($range != '')
         $range = '_' . $range;
-    }
     echo '<div class="graph">';
     echo ' <h3>' . $title . '</h3>';
     echo ' <img src="' . $name . $range . '.png">';
@@ -54,6 +53,7 @@
   $date = getdate();
   $client = $_SERVER['REMOTE_ADDR'];
   $range = $_GET['r'];
+
   echo "<h1>$host</h1>";
   echo "<h2>";
   switch ($range) {
@@ -72,7 +72,10 @@
   }
   echo "</h2>";
 
-  shell_exec('PATH=/opt/bin:$PATH /root/monitor/monitor.py report ' . $range);
+  if ($range != '')
+    $parm = " -$range";
+
+  shell_exec('PATH=/opt/bin:$PATH /root/monitor/monitor.py report' . $parm);
 ?>
 
 <p>
