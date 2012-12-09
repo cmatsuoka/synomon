@@ -15,8 +15,8 @@ _NAME = 'load'
 
 
 class _LoadMonitor(Monitor):
-    def __init__(self, config):
-        super(_LoadMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_LoadMonitor, self).__init__(config, name)
 
     def _parse(self):
         try:

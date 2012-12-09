@@ -14,8 +14,8 @@ _NAME = 'uptime'
 
 
 class _UptimeMonitor(Monitor):
-    def __init__(self, config):
-        super(_UptimeMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_UptimeMonitor, self).__init__(config, name)
 
     def _parse(self):
         try:

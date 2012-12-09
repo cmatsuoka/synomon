@@ -15,8 +15,8 @@ _NAME = 'hdio'
 
 
 class _IOMonitor(Monitor):
-    def __init__(self, config):
-        super(_IOMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_IOMonitor, self).__init__(config, name)
 
         if config.has_options('Hd', [ 'hds', 'max_hds' ]):
             self._hds = config.getlist('Hd', 'hds')

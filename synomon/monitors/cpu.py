@@ -14,8 +14,8 @@ _NAME = 'cpu'
 
 
 class _CpuMonitor(Monitor):
-    def __init__(self, config):
-        super(_CpuMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_CpuMonitor, self).__init__(config, name)
 
     def _parse(self):
         try:

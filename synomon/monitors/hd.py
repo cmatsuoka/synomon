@@ -14,8 +14,8 @@ _NAME = 'hd'
 
 
 class _HDMonitor(Monitor):
-    def __init__(self, config):
-        super(_HDMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_HDMonitor, self).__init__(config, name)
 
         if config.has_options('Hd', [ 'hds', 'max_hds' ]):
             self._hds = config.getlist('Hd', 'hds')

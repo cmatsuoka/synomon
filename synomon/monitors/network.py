@@ -15,8 +15,8 @@ _NAME = 'network'
 
 
 class _NetMonitor(Monitor):
-    def __init__(self, config):
-        super(_NetMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_NetMonitor, self).__init__(config, name)
 
         if config.has_options('Network', [ 'ifaces', 'max_lan' ]):
             self._ifaces = config.getlist('Network', 'ifaces')

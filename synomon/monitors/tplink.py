@@ -16,8 +16,8 @@ _NAME = 'tplink'
 
 
 class _TplinkMonitor(Monitor):
-    def __init__(self, config):
-        super(_TplinkMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_TplinkMonitor, self).__init__(config, name)
 
         if config.has_options('Tplink', [ 'host', 'user', 'password' ]):
             self._host = config.get('Tplink', 'host')

@@ -47,8 +47,15 @@ MONITOR = { }
 def all():
     return MONITOR.keys()
 
+def _init(label, config):
+    try:
+        monitor, name = label.split(':')
+        return MONITOR[monitor](config, name=name)
+    except:
+        return MONITOR[label](config)
+
 def monitors(config):
-    ret = [ MONITOR[i](config) for i in config.getlist('Global', 'monitors') ]
+    ret = [ _init(i, config) for i in config.getlist('Global', 'monitors') ]
     if config.changed():
         config.write()
     return ret

@@ -14,8 +14,8 @@ _NAME = 'volumes'
 
 
 class _VolMonitor(Monitor):
-    def __init__(self, config):
-        super(_VolMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_VolMonitor, self).__init__(config, name)
 
         if config.has_option('Volumes', 'max_vols'):
             self._max_vols = config.getint('Volumes', 'max_vols')

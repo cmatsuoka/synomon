@@ -15,8 +15,8 @@ _NAME = 'memory'
 
 
 class _MemMonitor(Monitor):
-    def __init__(self, config):
-        super(_MemMonitor, self).__init__(config, _NAME)
+    def __init__(self, config, name=_NAME):
+        super(_MemMonitor, self).__init__(config, name)
 
     def _parse(self):
         try:
