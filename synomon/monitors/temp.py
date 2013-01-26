@@ -3,7 +3,8 @@
 '''
 Read RDing TEMPer1V1 temperature sensor information
 
-This module reads temperature information using usb.core
+This module reads temperature information using usb.core. Sensor reading code
+by Lance R. Vick, http://bb10.com/python-pyusb-user/2012-02/msg00005.html
 '''
 
 from ..monitor import Monitor, MONITOR
@@ -77,9 +78,4 @@ class _TempGraph(Graph):
 
 MONITOR[_NAME] = _TempMonitor
 GRAPH[_NAME]   = _TempGraph, _NAME
-
-
-
-
-
 
